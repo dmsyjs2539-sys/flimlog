@@ -6,7 +6,10 @@
 
 :root {
   color-scheme: light;
-  font-family: 'Pretendard', 'Inter', 'Noto Sans KR', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Pretendard Variable', 'Pretendard', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* 세리프 - 브랜드 키워드 등 강조 표기 */
+  --font_serif: 'Noto Serif KR', Georgia, 'Times New Roman', serif;
 
   /* color */
   --color_bg: #fbf8f2;
@@ -20,10 +23,17 @@
   --color_accent_text: #3a2a00;
   --color_line: #dcd8cf;
 
-  /* layout - 360px 기준 */
-  --page_max: 1280px;
+  /* layout - 360px 기준
+     page_max: 1920 기준 좌우 120px 마진을 남기는 컨테이너 폭
+     text_max: 본문 텍스트 블록 최대 폭 (design-analysis 1200~1280) */
+  --page_max: 1680px;
+  --text_max: 1200px;
   --gutter: 16px;
-  --header_height: 100px;
+  /* 컨테이너 박스 폭 = 콘텐츠 폭 + 좌우 여백.
+     이렇게 해야 좌우 여백이 중앙 정렬 마진과 이중으로 더해지지 않는다. */
+  --container_max: calc(var(--page_max) + var(--gutter) * 2);
+  --header_gutter: 16px;
+  --header_height: 64px;
 
   color: var(--color_text);
   background-color: var(--color_bg);
@@ -81,7 +91,7 @@ a {
   left: 0;
   right: 0;
   z-index: 100;
-  padding: 12px var(--gutter);
+  padding: 10px var(--header_gutter);
   transition: background-color 0.25s ease, box-shadow 0.25s ease, padding 0.25s ease;
 }
 
@@ -106,45 +116,97 @@ a {
   opacity: 0;
 }
 
+/* 모바일 기본: [햄버거] - [로고] - [검색] 3분할 */
 .header_inner {
   position: relative;
   z-index: 1;
-  max-width: var(--page_max);
-  margin: 0 auto;
-  display: flex;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
 }
 
-.brand_logo {
+.nav_toggle,
+.search_toggle {
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
-  border: 1px solid currentColor;
+  padding: 0;
+  border: none;
+  background: transparent;
   color: var(--color_text_invert);
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 1.6px;
-  text-transform: uppercase;
-  white-space: nowrap;
+  cursor: pointer;
   transition: color 0.25s ease;
 }
 
-/* 360px에서 메뉴가 2줄로 접혀 헤더가 커지는 것을 막고 가로 스와이프로 처리 */
-.global_nav {
-  order: 3;
-  width: 100%;
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 16px;
-  overflow-x: auto;
-  scrollbar-width: none;
+.nav_toggle {
+  flex-direction: column;
+  gap: 5px;
 }
 
-.global_nav::-webkit-scrollbar {
+.nav_toggle_bar {
+  width: 22px;
+  height: 2px;
+  background: currentColor;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.nav_toggle[aria-expanded='true'] .nav_toggle_bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav_toggle[aria-expanded='true'] .nav_toggle_bar:nth-child(2) {
+  opacity: 0;
+}
+
+.nav_toggle[aria-expanded='true'] .nav_toggle_bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.brand_logo {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  transition: filter 0.25s ease;
+}
+
+.brand_logo img {
+  height: 38px;
+  width: auto;
+}
+
+/* logo.png는 투명 배경 위 흰색 로고다.
+   히어로 위에서는 그대로 쓰고, 크림 배경(스크롤 상태/푸터)에서는 어둡게 반전시킨다. */
+.site_header.is_scrolled .brand_logo img,
+.footer_logo img {
+  filter: brightness(0);
+}
+
+/* 모바일: 햄버거로 여는 드로어 */
+.global_nav {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
   display: none;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  background: rgba(251, 248, 242, 0.98);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.global_nav.is_open {
+  display: flex;
+}
+
+.global_nav.is_open a {
+  color: var(--color_brand);
+  padding: 12px 4px;
 }
 
 .global_nav a {
@@ -173,37 +235,59 @@ a {
   transform: scaleX(1);
 }
 
+/* 모바일에서는 검색 입력창을 숨기고 아이콘 버튼만 노출한다 */
 .search_box {
-  display: inline-flex;
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  display: none;
   align-items: center;
   gap: 8px;
-  flex: 1;
-  min-width: 0;
   padding: 8px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 1px 5.3px rgba(25, 33, 61, 0.03);
+  border: 1px solid var(--color_line);
+  background: var(--color_surface);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
   color: var(--color_text_muted);
   font-size: 14px;
 }
 
-.search_box span {
+.search_box.is_open {
+  display: flex;
+}
+
+.search_box input {
   flex: 1;
   min-width: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.search_box input:focus {
+  outline: none;
+}
+
+.search_submit {
+  flex: none;
+  display: inline-flex;
+  padding: 4px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
 }
 
 .icon_search {
   flex: none;
 }
 
-.site_header.is_scrolled .brand_logo,
-.site_header.is_scrolled .global_nav a {
+.site_header.is_scrolled .global_nav a,
+.site_header.is_scrolled .nav_toggle,
+.site_header.is_scrolled .search_toggle {
   color: var(--color_brand);
-}
-
-.site_header.is_scrolled .search_box {
-  border-color: var(--color_line);
-  background: var(--color_surface);
 }
 
 /* ---------------------------------------------------------
@@ -214,9 +298,11 @@ a {
   position: relative;
 }
 
-/* 고정 height 대신 aspect-ratio - 세로형 모바일 비율 */
+/* 고정 height 대신 aspect-ratio - 세로형 모바일 비율.
+   width를 명시하지 않으면 max-height가 폭까지 줄여버린다. */
 .hero_visual {
   position: relative;
+  width: 100%;
   aspect-ratio: 3 / 4;
   overflow: hidden;
 }
@@ -256,12 +342,19 @@ a {
   font-weight: 500;
 }
 
-.hero_actions {
-  margin-top: 28px;
+.locator_actions {
+  margin-top: 32px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 16px;
+}
+
+.locator_body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.8;
+  color: rgba(25, 25, 25, 0.64);
 }
 
 .button {
@@ -291,19 +384,72 @@ a {
   background: var(--color_accent_dark);
 }
 
+/* 크림 배경 위에 놓이므로 어두운 테두리/글자로 대비 확보 */
 .button_secondary {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: transparent;
+  color: var(--color_brand);
+  border: 1px solid var(--color_brand);
 }
 
 .button_secondary:hover {
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(13, 51, 34, 0.08);
 }
 
-/* 지도 카드 - 히어로 텍스트와 겹치지 않도록 히어로 아래 블록으로 배치 */
-.hero_map_card {
-  margin: 32px var(--gutter) 0;
+/* ---------------------------------------------------------
+   히어로 하단 지도 섹션 - 좌측 텍스트 + CTA, 우측 지도 카드
+   --------------------------------------------------------- */
+
+.locator_section {
+  max-width: var(--container_max);
+  margin: 0 auto;
+  padding: 96px var(--gutter) 120px;
+}
+
+/* 중앙 인트로 - 데스크톱에서 660px 높이를 확보해 여백을 두고 subtitle로 이어진다 */
+.locator_intro {
+  max-width: var(--text_max);
+  margin: 0 auto 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.locator_lead {
+  margin: 0 0 20px;
+  font-size: clamp(22px, 3vw, 40px);
+  line-height: 1.45;
+  color: var(--color_text);
+}
+
+/* 스크롤 연동 글자 등장 - main.js가 글자 단위 span으로 쪼갠다 */
+.letter_reveal_unit {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.24em);
+  transition: opacity 0.42s ease, transform 0.42s ease;
+}
+
+.letter_reveal_unit.is_revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter_reveal_unit {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.locator_layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+
+.map_card {
   background: var(--color_surface);
   padding: 12px;
   border-radius: 4px;
@@ -314,11 +460,14 @@ a {
   position: relative;
 }
 
+/* 시안 규격 751 x 797 - 좁은 화면에서는 비율만 유지하며 축소된다 */
 .map_image_wrapper {
   position: relative;
   overflow: hidden;
   border-radius: 2px;
-  aspect-ratio: 1 / 1;
+  width: 100%;
+  max-width: 751px;
+  aspect-ratio: 751 / 797;
 }
 
 .map_image_wrapper img {
@@ -366,21 +515,6 @@ a {
    sections
    --------------------------------------------------------- */
 
-.intro_section {
-  max-width: var(--page_max);
-  margin: 0 auto;
-  padding: 64px var(--gutter) 48px;
-  text-align: center;
-}
-
-.section_heading p {
-  margin: 0 auto 16px;
-  max-width: 1040px;
-  font-size: clamp(24px, 3vw, 40px);
-  line-height: 1.4;
-  color: var(--color_text);
-}
-
 .section_subtitle {
   margin: 0;
   font-size: clamp(16px, 1.8vw, 24px);
@@ -388,14 +522,40 @@ a {
 }
 
 .feature_section {
-  max-width: var(--page_max);
+  max-width: var(--container_max);
   margin: 0 auto;
-  padding: 48px var(--gutter);
+  padding: 96px var(--gutter) 120px;
+}
+
+/* 타이틀 영역과 아래 설명/카드 사이 간격 (데스크톱 250px) */
+.feature_intro {
+  max-width: var(--text_max);
+  margin: 0 auto 72px;
+  text-align: center;
+}
+
+.feature_intro h2 {
+  margin: 0 0 16px;
+  font-size: clamp(22px, 2.6vw, 34px);
+  line-height: 1.4;
+}
+
+.feature_intro_sub {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--color_text_muted);
 }
 
 .feature_text {
-  max-width: 814px;
+  max-width: var(--text_max);
   margin: 0 auto 48px;
+}
+
+.feature_text_en {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--color_text_muted);
 }
 
 .eyebrow {
@@ -419,31 +579,24 @@ a {
   letter-spacing: 0.48px;
 }
 
-/* 카드는 줄바꿈 없이 한 줄을 유지하고 가로 스크롤로 탐색한다 */
+/* 모바일 시안: 카드 5장이 세로로 나열된다 (가로 스크롤은 768px 이상에서만) */
 .feature_cards {
   display: flex;
-  flex-wrap: nowrap;
-  gap: 24px;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
-  padding-bottom: 16px;
+  flex-direction: column;
+  gap: 40px;
 }
 
 .feature_card {
-  flex: 0 0 80%;
-  min-width: 0;
-  scroll-snap-align: start;
   display: flex;
   flex-direction: column;
   gap: 24px;
-  border-right: 1px solid var(--color_line);
-  padding-right: 24px;
+  border-bottom: 1px solid var(--color_line);
+  padding-bottom: 32px;
 }
 
-/* 여백은 유지하고 구분선만 제거해야 카드 내용 폭이 서로 같아진다 */
 .feature_card:last-child {
-  border-right: none;
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 .feature_card img {
@@ -485,13 +638,16 @@ a {
   line-height: 1.6;
 }
 
+/* 모바일 규격 160 x 35 */
 .read_more {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  width: fit-content;
-  padding: 8px 24px;
-  border-radius: 30px;
+  width: 160px;
+  min-height: 35px;
+  padding: 6px 16px;
+  border-radius: 9999px;
   background: var(--color_accent);
   color: var(--color_accent_text);
   text-transform: uppercase;
@@ -509,27 +665,20 @@ a {
    --------------------------------------------------------- */
 
 .archive_section {
-  max-width: var(--page_max);
+  max-width: var(--container_max);
   margin: 0 auto;
-  padding: 48px var(--gutter) 64px;
+  padding: 96px var(--gutter) 120px;
 }
 
 .archive_description {
-  max-width: 582px;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
 }
 
 .archive_description h2 {
-  margin: 16px 0 24px;
-  font-size: clamp(24px, 3vw, 40px);
+  margin: 12px 0 0;
+  font-size: clamp(22px, 2.6vw, 34px);
+  line-height: 1.35;
   color: #363636;
-}
-
-.archive_description p {
-  margin: 0;
-  color: var(--color_text_muted);
-  font-size: 16px;
-  line-height: 1.5;
 }
 
 .archive_grid {
@@ -539,16 +688,16 @@ a {
   align-items: start;
 }
 
+/* 시안: 좌측 열은 소개글 - 제품 사진 - 특징 목록 순으로 세로 배치 */
 .archive_left {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 24px;
-  align-items: start;
 }
 
 .archive_media img {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 5 / 4;
   height: auto;
   object-fit: cover;
   border-radius: 12px;
@@ -588,13 +737,36 @@ a {
   position: relative;
 }
 
-/* 3:2 - 원본(2432x1622)과 같은 비율이라 잘림 없이 들어간다 */
-.archive_side_image {
+/* 메인 프레임 5장을 겹쳐 두고 교차 페이드 */
+.archive_stage {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
   width: 100%;
-  aspect-ratio: 3 / 2;
-  height: auto;
-  object-fit: cover;
+  aspect-ratio: 4 / 3;
   border-radius: 12px;
+  overflow: hidden;
+  background: var(--color_line);
+}
+
+.archive_frame {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.03);
+  transition: opacity 0.55s ease, transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.archive_frame.is_active {
+  opacity: 1;
+  transform: none;
+}
+
+.archive_frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .archive_side_nav {
@@ -643,21 +815,46 @@ a {
 }
 
 .archive_thumbs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 
-.archive_thumbs img {
+.archive_thumb {
+  display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0.62;
+  transition: opacity 0.3s ease, outline-color 0.3s ease;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.archive_thumb:hover {
+  opacity: 0.85;
+}
+
+.archive_thumb.is_active {
+  opacity: 1;
+  outline-color: var(--color_accent);
+}
+
+.archive_thumb img {
+  width: 100%;
+  aspect-ratio: 3 / 2;
   height: auto;
   object-fit: cover;
-  border-radius: 8px;
 }
 
 .button_accent {
-  width: fit-content;
   background: var(--color_accent);
   color: var(--color_accent_text);
 }
@@ -667,137 +864,68 @@ a {
    --------------------------------------------------------- */
 
 .gallery_section {
-  max-width: var(--page_max);
+  max-width: var(--container_max);
   margin: 0 auto;
-  padding: 48px var(--gutter);
+  padding: 96px var(--gutter) 120px;
 }
 
-.gallery_heading {
-  max-width: 780px;
-  margin-bottom: 40px;
-}
-
-.gallery_heading h2 {
-  margin: 0;
-  font-size: clamp(24px, 3vw, 40px);
-  line-height: 1.3;
-}
-
-.gallery_showcase {
+.gallery_layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 32px;
+  gap: 40px;
   align-items: start;
 }
 
-.showcase_media {
-  position: relative;
+/* 좌측: 고정 레이아웃 */
+.gallery_info h2 {
+  margin: 0 0 20px;
+  font-size: clamp(22px, 2.6vw, 34px);
+  font-weight: 700;
+  line-height: 1.35;
 }
 
-.showcase_image {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  height: auto;
-  object-fit: cover;
-  border-radius: 16px;
+.gallery_description {
+  margin: 0 0 28px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--color_text_muted);
 }
 
-.showcase_like {
-  position: absolute;
-  left: 16px;
-  bottom: 76px;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: #ffffff;
-  font-size: 20px;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+.archive_meta {
+  margin: 0 0 28px;
+  padding: 20px 0 0;
+  border-top: 1px solid var(--color_line);
 }
 
-.showcase_like img {
-  width: 22px;
-  height: 22px;
+.archive_meta_label {
+  margin: 0 0 14px;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--color_brand);
 }
 
-.showcase_caption {
-  position: absolute;
-  left: 16px;
-  top: 16px;
-  color: #ffffff;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
-}
-
-.showcase_caption p {
-  margin: 0 0 6px;
-}
-
-.showcase_caption_label {
-  font-size: 15px;
-  font-weight: 300;
-}
-
-.showcase_caption_title {
-  font-size: 22px;
-  font-weight: 500;
-}
-
-.showcase_caption_author {
-  font-size: 15px;
-  font-weight: 300;
-}
-
-.carousel_controls {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.carousel_controls button {
-  border: none;
-  background: transparent;
-  color: #ffffff;
-  font-size: 15px;
-  cursor: pointer;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-}
-
-.carousel_primary {
-  background: rgba(255, 255, 255, 0.18);
-  padding: 10px 22px;
-  border-radius: 30px;
-  transition: background-color 0.2s ease;
-}
-
-.carousel_primary:hover {
-  background: rgba(255, 255, 255, 0.32);
-}
-
-.gallery_grid_wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.gallery_grid {
+.archive_meta_row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 12px;
+  padding: 6px 0;
 }
 
-.gallery_grid img {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  height: auto;
-  object-fit: cover;
-  border-radius: 10px;
+.archive_meta_row dt {
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color_text_muted);
+}
+
+.archive_meta_row dd {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color_text);
 }
 
 .more_gallery {
-  align-self: flex-end;
   display: inline-flex;
   align-items: center;
   gap: 3px;
@@ -807,18 +935,163 @@ a {
   text-transform: uppercase;
 }
 
-.more_gallery img {
-  width: 22px;
-  height: 22px;
+.more_gallery svg {
+  flex: none;
+}
+
+/* 우측: 카드형 가로 캐러셀 */
+.gallery_carousel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 스크롤 스냅 대신 교차 페이드 - 스냅과 부드러운 스크롤이 충돌해 생기던 튕김이 사라진다.
+   비율은 시안 규격 362 x 352 기준 (폭은 열 너비를 따라 유동) */
+.carousel_viewport {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--color_line);
+  aspect-ratio: 362 / 352;
+}
+
+.carousel_track {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  inset: 0;
+}
+
+.carousel_slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.03);
+  transition: opacity 0.55s ease, transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
+  pointer-events: none;
+}
+
+.carousel_slide.is_active {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.carousel_slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 하단 캡션 - active 슬라이드 데이터로 갱신된다 */
+.carousel_caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 48px 20px 18px;
+  color: #ffffff;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0));
+  pointer-events: none;
+}
+
+.carousel_caption_index {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.carousel_caption_title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.carousel_caption_likes {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+}
+
+.carousel_caption_likes .icon_heart {
+  flex: none;
+}
+
+.visually_hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+  border: 0;
+}
+
+.carousel_controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.carousel_button {
+  border: none;
+  padding: 0;
+  background: transparent;
+  border-radius: 100%;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.carousel_button:hover {
+  opacity: 0.75;
+}
+
+.carousel_button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.carousel_button img {
+  width: 40px;
+  height: 40px;
+}
+
+/* 두 화살표 SVG의 path가 동일해 왼쪽만 좌우 반전시킨다 */
+.carousel_button[data-carousel_step="-1"] img,
+.archive_side_nav button[aria-label="이전 사진"] img {
+  transform: scaleX(-1);
+}
+
+.carousel_status {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 2px;
+  color: var(--color_text_muted);
 }
 
 /* ---------------------------------------------------------
    approach
    --------------------------------------------------------- */
 
+/* 브랜드 스토리 높이 - 360:787 / 768:1145 사이를 선형 보간 (768 이상은 아래 미디어쿼리) */
 .approach_section {
   position: relative;
-  padding: 64px var(--gutter);
+  min-height: clamp(787px, calc(471px + 87.75vw), 1145px);
+  padding: 112px var(--gutter);
+  display: flex;
+  align-items: center;
   color: #ffffff;
 }
 
@@ -828,65 +1101,99 @@ a {
   overflow: hidden;
 }
 
-.approach_background img {
+/* 키워드별 브랜드 이미지 - is_active 하나만 보이고 나머지는 교차 페이드 */
+.approach_image {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 1s ease, transform 1.6s ease;
+}
+
+.approach_image.is_active {
+  opacity: 1;
+  transform: none;
 }
 
 .approach_overlay {
   position: absolute;
   inset: 0;
-  background: rgba(40, 45, 42, 0.62);
+  background: rgba(40, 45, 42, 0.45);
 }
 
+/* 부모 섹션이 이미 좌우 여백을 갖고 있으므로 콘텐츠 폭만 제한한다 */
 .approach_content {
   position: relative;
-  max-width: 760px;
+  width: 100%;
+  max-width: var(--page_max);
   margin: 0 auto;
   z-index: 1;
 }
 
+.approach_heading {
+  max-width: var(--text_max);
+  margin: 0 auto;
+  text-align: center;
+}
+
 .approach_content h2 {
-  margin: 0 0 24px;
-  font-size: clamp(24px, 3vw, 40px);
-  line-height: 1.25;
+  margin: 0 0 20px;
+  font-size: clamp(22px, 2.6vw, 34px);
+  line-height: 1.35;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
 }
 
-.approach_content p {
-  margin: 0 0 24px;
-  font-size: 16px;
-  line-height: 1.7;
+.approach_heading p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.8;
   color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
 }
 
+/* 시안: 구분선 아래 세 단어를 전체 폭에 걸쳐 세리프로 펼친다 */
 .approach_list {
+  list-style: none;
+  margin: 56px 0 0;
+  padding: 32px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
   display: flex;
-  gap: 16px;
   flex-wrap: wrap;
-  padding-top: 30px;
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  justify-content: space-between;
+  gap: 16px;
 }
 
-.approach_list button {
+.approach_key {
+  padding: 0;
+  border: none;
   background: transparent;
-  color: var(--color_text_invert);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  padding: 8px 20px;
-  border-radius: 30px;
-  font-size: clamp(16px, 1.8vw, 22px);
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  font-family: var(--font_serif);
+  font-size: clamp(22px, 3.4vw, 44px);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.4);
+  transition: color 0.4s ease, opacity 0.4s ease;
 }
 
-.approach_list button:hover {
-  background: rgba(255, 255, 255, 0.14);
+.approach_key:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.approach_key.is_active {
+  color: #ffffff;
 }
 
 .approach_detail {
-  margin-top: 40px;
+  margin-top: 80px;
   max-width: 640px;
   color: #ffffff;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
 }
 
 .approach_detail p {
@@ -908,8 +1215,8 @@ a {
    --------------------------------------------------------- */
 
 .site_footer {
-  background: var(--color_surface);
-  padding: 48px var(--gutter) 24px;
+  background: var(--color_bg);
+  padding: 64px var(--gutter) 32px;
   color: var(--color_text);
 }
 
@@ -929,17 +1236,19 @@ a {
 }
 
 .footer_logo {
-  color: #020202;
-  font-size: clamp(28px, 3vw, 40px);
-  font-weight: 700;
-  letter-spacing: 3.6px;
-  border: none;
-  padding: 0;
+  display: inline-flex;
+}
+
+.footer_logo img {
+  height: 56px;
+  width: auto;
 }
 
 .footer_brand p {
   margin: 0;
-  font-size: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color_text_muted);
 }
 
 .footer_info {
@@ -982,11 +1291,12 @@ a {
 @media (min-width: 768px) {
   :root {
     --gutter: 32px;
-    --header_height: 116px;
+    --header_gutter: 32px;
+    --header_height: 88px;
   }
 
   .site_header {
-    padding: 16px var(--gutter);
+    padding: 18px var(--header_gutter);
   }
 
   .site_header.is_scrolled {
@@ -994,34 +1304,64 @@ a {
     padding-bottom: 12px;
   }
 
+  /* 태블릿부터 햄버거/검색 아이콘을 감추고 로고 - 메뉴 - 검색창 한 줄 배치 */
+  .nav_toggle,
+  .search_toggle {
+    display: none;
+  }
+
   .header_inner {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    gap: 20px;
   }
 
   .brand_logo {
-    padding: 10px 18px;
-    font-size: 22px;
-    letter-spacing: 2.2px;
+    justify-self: auto;
   }
 
-  /* 한글 메뉴 5개 + 로고 + 검색은 1280px 미만에서 한 줄에 들어가지 않으므로
-     태블릿까지는 메뉴를 자체 행으로 유지한다 (데스크톱에서 인라인 전환) */
+  .brand_logo img {
+    height: 44px;
+  }
+
   .global_nav {
-    flex-wrap: wrap;
-    overflow-x: visible;
-    gap: 24px;
+    position: static;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 16px;
+    padding: 0;
+    background: none;
+    backdrop-filter: none;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .global_nav a {
-    font-size: 16px;
+    font-size: 14px;
+    padding-bottom: 4px;
+    white-space: nowrap;
+  }
+
+  .site_header.is_scrolled .global_nav a {
+    padding: 0 0 4px;
   }
 
   .search_box {
-    flex: 0 1 auto;
-    min-width: 170px;
-    padding: 10px 18px;
-    font-size: 16px;
+    position: static;
+    display: flex;
+    width: 150px;
+    padding: 9px 12px;
+    font-size: 13px;
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 1px 5.3px rgba(25, 33, 61, 0.03);
+  }
+
+  .site_header.is_scrolled .search_box {
+    border-color: var(--color_line);
+    background: var(--color_surface);
   }
 
   .hero_visual {
@@ -1045,10 +1385,11 @@ a {
     font-size: clamp(18px, 2.4vw, 24px);
   }
 
-  .hero_actions {
+  .locator_actions {
     flex-direction: row;
     align-items: center;
     flex-wrap: wrap;
+    gap: 32px;
   }
 
   .button {
@@ -1057,74 +1398,106 @@ a {
     font-size: clamp(16px, 2vw, 22px);
   }
 
-  /* 태블릿 시안에서는 지도 카드가 중앙 정렬 (데스크톱에서 우측 정렬로 전환) */
-  .hero_map_card {
-    width: min(520px, 70%);
-    margin-top: 64px;
-    margin-left: auto;
-    margin-right: auto;
+  .locator_section {
+    padding: 96px var(--gutter) 112px;
   }
 
-  .intro_section {
-    padding: 96px var(--gutter) 64px;
+  .locator_intro {
+    min-height: 380px;
+    margin-bottom: 80px;
   }
 
-  .feature_section,
+  .locator_layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 46%);
+    gap: 48px;
+    align-items: center;
+  }
+
+  /* 좌측 텍스트 그룹과 CTA 사이 수직 간격 */
+  .locator_actions {
+    margin-top: 90px;
+  }
+
+  .feature_intro {
+    margin-bottom: 140px;
+  }
+
+  /* 우측 이미지 영역 확대 */
+  .gallery_layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 52%);
+    gap: 48px;
+  }
+
+  .feature_section {
+    padding: 96px var(--gutter) 112px;
+  }
+
   .gallery_section {
-    padding: 64px var(--gutter);
+    padding: 96px var(--gutter) 112px;
   }
 
   .archive_section {
-    padding: 64px var(--gutter) 80px;
+    padding: 96px var(--gutter) 112px;
   }
 
-  /* 2장 + 다음 카드 일부가 보여 스크롤 가능함을 알린다 */
+  /* 태블릿부터 가로 스크롤 레일. 2장 + 다음 카드 일부가 보여 스크롤 가능함을 알린다.
+     스크롤 동작은 유지하되 스크롤바는 시각적으로 감춘다. */
   .feature_cards {
+    flex-direction: row;
+    flex-wrap: nowrap;
     gap: 30px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .feature_cards::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 휠 드래그 중임을 알리는 커서 (main.js가 is_dragging을 토글) */
+  .feature_cards.is_draggable {
+    cursor: grab;
+  }
+
+  .feature_cards.is_dragging {
+    cursor: grabbing;
+    user-select: none;
+  }
+
+  .feature_cards.is_dragging a,
+  .feature_cards.is_dragging img {
+    pointer-events: none;
   }
 
   .feature_card {
-    flex-basis: calc((100% - 30px) / 2.3);
+    flex: 0 0 calc((100% - 30px) / 2.3);
+    min-width: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+    border-right: 1px solid var(--color_line);
     padding-right: 30px;
   }
 
-  /* 시안: 제품 사진(세로) 좌측 + 설명 텍스트 우측 */
-  .archive_left {
-    grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
+  /* 여백은 유지하고 구분선만 제거해야 카드 내용 폭이 서로 같아진다 */
+  .feature_card:last-child {
+    border-right: none;
+    padding-bottom: 0;
   }
 
-  .archive_media img {
-    aspect-ratio: 3 / 4;
-  }
-
-  .gallery_grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .showcase_caption,
-  .showcase_like {
-    left: 32px;
-  }
-
-  .showcase_caption {
-    top: 32px;
-  }
-
-  .showcase_like {
-    bottom: 96px;
-  }
-
-  .carousel_controls {
-    bottom: 32px;
-    gap: 16px;
-  }
-
-  .carousel_controls button {
-    font-size: 18px;
-  }
-
+  /* 768:1145 -> 1920:1670 선형 보간 */
   .approach_section {
-    padding: 96px var(--gutter);
+    min-height: clamp(1145px, calc(795px + 45.57vw), 1670px);
+    padding: 120px var(--gutter);
+  }
+
+  .approach_detail {
+    margin-top: 120px;
+  }
+
+  .carousel_caption {
+    padding: 56px 24px 20px;
   }
 
   .site_footer {
@@ -1138,98 +1511,190 @@ a {
 }
 
 /* =========================================================
-   데스크톱 - 1280px 이상 (3~4열, 좌우 여백 40px, max-width 1280 중앙)
+   데스크톱 - 1280px 이상
+   1920 기준 컨테이너 좌우 마진 120px (page_max 1680 + gutter),
+   헤더는 좌우 130px, 본문 텍스트 블록은 text_max(1200)로 제한
    ========================================================= */
 
 @media (min-width: 1280px) {
   :root {
-    --gutter: 40px;
+    /* 1280 -> 80px, 1920 -> 120px */
+    --gutter: clamp(80px, 6.25vw, 120px);
+    /* 1280 -> 86px, 1920 -> 130px */
+    --header_gutter: clamp(86px, 6.77vw, 130px);
     --header_height: 92px;
   }
 
   .site_header {
-    padding: 20px var(--gutter);
+    padding: 22px var(--header_gutter);
   }
 
-  .brand_logo {
-    padding: 10px 18px;
-    font-size: 24px;
-    letter-spacing: 2.4px;
+  .header_inner {
+    max-width: none;
+    gap: 40px;
   }
 
-  /* 데스크톱에서만 로고 - 메뉴 - 검색을 한 줄에 배치 */
+  .brand_logo img {
+    height: 52px;
+  }
+
   .global_nav {
-    order: 0;
-    width: auto;
-    gap: 28px;
+    gap: 30px;
   }
 
   .global_nav a {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .search_box {
-    min-width: 210px;
+    width: 220px;
+    padding: 11px 18px;
+    font-size: 15px;
   }
 
-  /* 컨테이너(max 1280px) 좌측 가장자리에 맞춰 정렬 */
+  /* 히어로 카피는 배너 좌측/하단에서 각각 100px */
   .hero_content {
-    left: max(var(--gutter), (100% - var(--page_max)) / 2);
+    left: 100px;
+    right: auto;
+    bottom: 100px;
+    top: auto;
+    width: min(760px, calc(100% - 200px));
   }
 
-  .hero_map_card {
-    width: min(420px, 40%);
-    margin-right: max(var(--gutter), (100% - var(--page_max)) / 2);
+  .locator_section {
+    padding: 140px var(--gutter) 160px;
   }
 
-  .intro_section {
-    padding: 120px var(--gutter) 80px;
+  /* 인트로 영역 660px 확보 후 subtitle로 이어짐 */
+  .locator_intro {
+    min-height: 660px;
+    margin-bottom: 0;
   }
 
-  .feature_section,
+  /* 지도 이미지 751x797 + 카드 좌우 패딩 12px = 775px 상한.
+     1280 구간에서 좌측 텍스트가 눌리지 않도록 비율 상한을 함께 둔다. */
+  .locator_layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, min(775px, 52%));
+    gap: 100px;
+  }
+
+  /* 좌측 텍스트 그룹과 CTA 버튼 사이 수직 간격 170px */
+  .locator_actions {
+    margin-top: 170px;
+  }
+
+  .feature_section {
+    padding: 140px var(--gutter) 160px;
+  }
+
   .gallery_section {
-    padding: 80px var(--gutter);
+    padding: 140px var(--gutter) 160px;
   }
 
   .archive_section {
-    padding: 80px var(--gutter) 100px;
+    padding: 140px var(--gutter) 160px;
   }
 
-  /* 디자인 기준 4장이 한 화면에 모두 들어간다 (스크롤 없음) */
+  /* 데스크톱 시안은 4장이 보이고 5번째는 가로 스크롤로 나타난다 */
   .feature_card {
-    flex-basis: calc((100% - 3 * 30px) / 4);
+    flex: 0 0 calc((100% - 3 * 30px) / 4);
   }
 
+  /* 시안: 좌측 소개/제품 열이 좁고 우측 사진 열이 넓다 */
   .archive_grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
     gap: 60px;
   }
 
-  .gallery_showcase {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 340px);
+  /* 타이틀 영역과 아래 설명/카드 영역 사이 간격 250px */
+  .feature_intro {
+    margin-bottom: 250px;
   }
 
-  .gallery_grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* 우측 이미지 영역 확대 */
+  .gallery_layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, min(760px, 55%));
+    gap: 80px;
   }
 
   .approach_section {
-    padding: 120px var(--gutter);
+    padding: 180px var(--gutter);
+  }
+
+  .approach_detail {
+    margin-top: 180px;
   }
 
   .site_footer {
-    padding: 80px var(--gutter) 40px;
+    padding: 120px var(--gutter) 48px;
   }
 
   .footer_top {
     grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
-    gap: 60px;
+    gap: 80px;
   }
 }
 
 /* =========================================================
    접근성 - 모션 최소화 (PRD §15)
    ========================================================= */
+
+/* =========================================================
+   모바일 - 767px 이하
+   한 화면에 한 섹션씩 들어오도록 섹션 간 여백을 넉넉히 준다
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  .locator_section,
+  .feature_section,
+  .archive_section,
+  .gallery_section {
+    padding-top: 120px;
+    padding-bottom: 140px;
+  }
+
+  /* 지정 높이(787px)에 최대한 근접하도록 상하 여백을 줄인다 */
+  .approach_section {
+    padding-top: 88px;
+    padding-bottom: 88px;
+  }
+
+  .approach_detail {
+    margin-top: 64px;
+  }
+
+  .locator_intro {
+    min-height: 60vh;
+    justify-content: center;
+    margin-bottom: 96px;
+  }
+
+  .locator_actions {
+    margin-top: 56px;
+  }
+
+  .feature_intro {
+    margin-bottom: 96px;
+  }
+
+  .feature_cards {
+    gap: 72px;
+  }
+
+  .archive_grid,
+  .gallery_layout {
+    gap: 72px;
+  }
+
+  .approach_detail {
+    margin-top: 96px;
+  }
+
+  .site_footer {
+    padding-top: 96px;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   html {

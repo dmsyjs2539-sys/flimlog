@@ -76,6 +76,134 @@ mobile-first로 재구성. 브레이크포인트를 PRD 기준값 그대로 사�
 - 데스크톱 `.archive_left` 제품 사진 폭 240px → 280px (시안 비중 반영)
 - 태블릿 지도 카드를 우측 정렬 → 중앙 정렬 (태블릿 시안 기준)
 
+### 히어로 / CTA / 갤러리 캐러셀 (2026-07-27)
+
+- **CTA 분리**: 히어로 배너는 배경 + 헤드라인 + 서브 텍스트만. CTA 2개는 새 `.locator_section`
+  (좌측 텍스트 + CTA / 우측 지도 카드 2열)으로 이동. `.hero_map_card` → `.map_card` 개명.
+- `.button_secondary`를 크림 배경용(진한 초록 테두리·글자)으로 변경. 히어로 위 반투명 흰색은 더 이상 맞지 않음.
+- **피처 카드 5장 복원**: `Summer Film Picks` 재추가. 360px는 세로 스택, 768px 이상만 가로 스크롤 레일.
+- **갤러리 캐러셀**: `.gallery_layout` 2열. 좌측 고정(타이틀·설명·[FILM ARCHIVE]),
+  우측 카드형 캐러셀 6장. 슬라이드 데이터는 `data-slide_*` 속성, 표시 대상은 `[data-slide_field]`.
+  active index 변경 시 좌측 카메라/필름/작가 + 우측 하단 캡션(번호/제목/좋아요) + 카운터가 함께 갱신.
+- 하트·화살표 아이콘을 `currentColor` 인라인 SVG로 교체 (기존 `heart.svg`·`arrow-up-right.svg`는
+  밝은 고정색이라 각각 어두운 캡션/크림 배경에서 보이지 않았음).
+
+#### 캐러셀 구현 중 잡은 버그 2건
+
+1. IntersectionObserver 콜백이 한 번에 여러 슬라이드를 전달할 때 **순회 마지막 항목이 이겨서** 로드 직후
+   6번 슬라이드가 선택됨 → 교차 비율이 가장 큰 항목을 고르도록 수정.
+2. 브라우저가 트랙 스크롤 위치를 끝으로 복원해 `render(0)`이 즉시 덮어써짐 → 초기화 시
+   `scrollToSlide(0, 'auto')`로 명시 초기화. `scroll-snap-align`도 `center` → `start`.
+3. 뷰포트 폭이 바뀌면 슬라이드 너비가 달라져 스크롤 위치가 어긋남 → resize 시 현재 슬라이드로 재정렬.
+
+### 최종 시안 기준 전면 정렬 (2026-07-28)
+
+`데스크탑_최종.png` / `태블릭_최종.png` / `모바일_최종.png` 및 `logo.png` 반영.
+
+#### 컨테이너 규격
+
+| 토큰 | 값 | 비고 |
+|---|---|---|
+| `--page_max` | 1680px | 콘텐츠 폭. 1920에서 좌우 마진 120px |
+| `--container_max` | `page_max + gutter*2` | 여백이 중앙정렬 마진과 이중 적용되지 않도록 |
+| `--text_max` | 1200px | 본문 텍스트 블록 (design-analysis 1200~1280) |
+| `--gutter` | 16 / 32 / `clamp(80,6.25vw,120)` | 모바일 / 태블릿 / 데스크톱 |
+| `--header_gutter` | 16 / 32 / `clamp(86,6.77vw,130)` | 1920에서 130px |
+
+#### 지정 수치 반영 (1920px 실측)
+
+- header_inner 좌우 마진 **130px**
+- 메인 컨테이너 좌우 마진 **120px** (콘텐츠 폭 1680)
+- hero_caption 좌측 **100px** / 하단 **100px**
+- locator_intro 높이 **660px** 확보 후 section_subtitle로 연결
+
+#### 구조 변경
+
+- 로고를 `assets/image/logo.png`로 교체. **투명 배경 흰색 로고**라 크림 배경(스크롤 헤더·푸터)에서만
+  `filter: brightness(0)`으로 반전.
+- 모바일(<768) 헤더를 [햄버거] - [로고] - [검색] 3분할로 전환. 드로어/검색은 상호 배타, ESC·바깥 클릭·
+  데스크톱 복귀 시 닫힘. `aria-expanded`/`aria-label` 동기화.
+- 시안대로 eyebrow + "당신의 평범한 하루에..." + 본문 + CTA를 locator 섹션으로 이동.
+  feature 섹션은 "처음이어도 괜찮아, 셔터를 누르는 순간부터" 중앙 헤딩으로 교체.
+- archive 좌측 열을 소개글 → 제품 사진 → 특징 목록 세로 스택으로 변경 (기존 2열 → 1열).
+  제품 사진 `5/4`, 고양이 `4/3`, 썸네일 `3/2`.
+- approach의 Grain/Connection/Creation을 pill 버튼 → 구분선 아래 전체 폭 세리프 텍스트로 변경.
+- 섹션 세로 패딩 확대: 데스크톱 140~180px, 태블릿 96~120px, 모바일 48~80px.
+
+#### 이번에 잡은 버그
+
+- `.hero_visual`에 `width`가 없어 `max-height: 90vh`가 **폭까지** 1688px로 줄이고 있었음 →
+  `width: 100%` 명시.
+- 섹션 컨테이너가 `max-width: page_max` + `padding: gutter`라 1920에서 좌우 여백이
+  120이 아니라 **240px**로 이중 적용됨 → `--container_max` 도입.
+- 768px에서 헤더가 137px 2줄 → nav 14px/gap 16px, 검색창 150px로 줄여 85px 1줄.
+
+### 세부 수치 · 인터랙션 · 폰트 (2026-07-28)
+
+#### 폰트
+
+- `Pretendard Variable` (jsDelivr CDN) 본문 전역, `Noto Serif KR` (Google Fonts) `--font_serif`로
+  브랜드 키워드(Grain/Connection/Creation)에 적용.
+- `design-analysis.md` 버튼 명세를 `4~6px` → **캡슐형 `9999px`** 로 갱신 (최종 시안 기준).
+
+#### 지정 수치 (1920 실측)
+
+| 항목 | 값 |
+|---|---|
+| 헤더 로고 높이 | 52px (태블릿 44 / 모바일 38) |
+| 푸터 로고 | 56px, 테두리 제거 |
+| 지도 이미지 | **751 x 797** |
+| 텍스트 그룹 ↔ CTA 수직 간격 | **170px** (태블릿 90) |
+| 피처 타이틀 ↔ 설명/카드 간격 | **250px** (태블릿 140) |
+| 갤러리 우측 이미지 | 760px (기존 560) |
+
+1280 구간에서 좌측 텍스트가 눌리지 않도록 두 열 모두 `min(고정폭, 비율)` 상한을 함께 둔다.
+
+#### 인터랙션
+
+- **글자 등장**: `[data-letter_reveal]`를 단어 → 글자 span으로 분해하고 IntersectionObserver 진입 시
+  18ms 간격으로 `is_revealed` 부여. `prefers-reduced-motion`이면 즉시 전체 표시.
+- **캐러셀 전환**: 스크롤 스냅 방식을 폐기하고 슬라이드를 절대 배치 후 교차 페이드(+미세 scale).
+  스냅과 smooth scroll이 충돌해 생기던 튕김이 원천 제거됨. 터치 스와이프는 별도 핸들러로 유지.
+- **브랜드 스토리**: Grain/Connection/Creation 버튼 클릭 시 `brandstory1~3.png`로 교차 페이드,
+  5초 자동 롤링. hover/focus 중에는 정지, 탭이 백그라운드로 가면 정지.
+- 피처 레일은 `overflow-x: auto` 유지하되 `scrollbar-width: none` + `::-webkit-scrollbar { display: none }`
+  으로 스크롤바만 숨김 (실측 스크롤바 높이 0px).
+
+#### 모바일 섹션 간격
+
+360px에서 섹션별 `padding: 120px / 140px`, approach `140px / 140px`,
+`locator_intro`는 `min-height: 60vh`로 한 화면에 한 섹션이 들어오도록 확장.
+
+### 컴포넌트 규격 · 가로 스크롤 · 슬라이더 (2026-07-28)
+
+| 항목 | 값 |
+|---|---|
+| Read More 버튼 | 160 x 35 (전 브레이크포인트) |
+| 갤러리 메인 이미지 | `aspect-ratio: 362 / 352` — 1920에서 760x739, 768에서 366x356 |
+| CTA 버튼 좌우 간격 | 16px → **32px** (768 이상) |
+| 브랜드 스토리 높이 | 360:787 / 768:1145 / 1920:1670 을 `clamp()` 선형 보간 |
+
+- 브랜드 스토리 배경을 `21.brand1.jpg` / `22.brand2.png` / `23.21.brand3.png`로 교체.
+  딤 처리(`rgba(40,45,42,0.45)`)와 키워드 텍스트는 유지.
+- 아카이브 우측을 슬라이더로 전환. 프레임 5장(대표 고양이 + 썸네일 4장)을 `<` `>` 버튼이 순환하고,
+  썸네일 클릭으로 직접 이동. 활성 썸네일은 앰버 아웃라인.
+- 갤러리 캐러셀 `<` `>` 를 **순환(Loop)** 으로 변경 (끝에서 disabled 되던 로직 제거).
+
+#### 피처 레일 가로 스크롤
+
+- `overflow-x: auto` + `scrollbar-width: none` + `::-webkit-scrollbar { display: none }` (스크롤바 높이 0px)
+- `wheel` 핸들러로 세로 휠 → 가로 스크롤 매핑. 레일 양 끝에서는 `preventDefault`를 하지 않아
+  페이지 세로 스크롤로 자연스럽게 넘어간다.
+- Pointer 드래그 지원 (`is_draggable` / `is_dragging` 커서, 드래그 후 클릭은 취소).
+- **`scroll-snap-type: x proximity`를 제거**했다. 스냅이 휠/드래그로 이동한 위치를 즉시 0으로
+  되감아 "가로 스크롤이 안 되는" 증상의 직접 원인이었다.
+
+#### 글자 등장 보강
+
+`threshold: 0.25` → `0.01` + `rootMargin: '0px 0px -12% 0px'`.
+문장이 뷰포트보다 길면 0.25에 도달하지 못해 트리거되지 않던 문제를 해소.
+
 ## 검증 결과
 
 브라우저 실측 (2026-07-27).
