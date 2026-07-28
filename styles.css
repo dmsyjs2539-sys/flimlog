@@ -81,6 +81,21 @@ a {
   min-height: 100vh;
 }
 
+/* 브레이크포인트별 문구 교체용 - display:none이라 스크린리더도 한쪽만 읽는다 */
+.only_desktop {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .only_desktop {
+    display: block;
+  }
+
+  .only_mobile {
+    display: none;
+  }
+}
+
 /* ---------------------------------------------------------
    header - 히어로 이미지 위에 겹쳐 놓이므로 흐름 공간을 차지하지 않는다
    --------------------------------------------------------- */
@@ -342,12 +357,20 @@ a {
   font-weight: 500;
 }
 
+/* 모바일 순서: 타이틀/설명(1) -> 지도 카드(2) -> CTA(3) */
 .locator_actions {
+  order: 3;
   margin-top: 32px;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 16px;
+  align-items: center;
+  gap: 14px;
+}
+
+/* 전체 폭은 부담스러워 상한을 두고 가운데 정렬 */
+.locator_actions .button {
+  width: 100%;
+  max-width: 260px;
 }
 
 .locator_body {
@@ -447,6 +470,14 @@ a {
   grid-template-columns: minmax(0, 1fr);
   gap: 40px;
   align-items: start;
+}
+
+.locator_text {
+  order: 1;
+}
+
+.map_card {
+  order: 2;
 }
 
 .map_card {
@@ -1091,7 +1122,7 @@ a {
   min-height: clamp(787px, calc(471px + 87.75vw), 1145px);
   padding: 112px var(--gutter);
   display: flex;
-  align-items: center;
+  align-items: stretch;
   color: #ffffff;
 }
 
@@ -1125,11 +1156,16 @@ a {
 }
 
 /* 부모 섹션이 이미 좌우 여백을 갖고 있으므로 콘텐츠 폭만 제한한다 */
+/* 헤딩/키워드는 위, 설명 텍스트와 Read More는 카드 하단에 붙는다.
+   min-height를 물려받으면 패딩만큼 섹션이 더 커지므로 flex 스트레치로 채운다. */
 .approach_content {
   position: relative;
+  flex: 1;
   width: 100%;
   max-width: var(--page_max);
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
   z-index: 1;
 }
 
@@ -1189,8 +1225,10 @@ a {
   color: #ffffff;
 }
 
+/* auto 마진으로 남는 공간을 위로 밀어 하단 정렬 */
 .approach_detail {
-  margin-top: 80px;
+  margin-top: auto;
+  padding-top: 64px;
   max-width: 640px;
   color: #ffffff;
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
@@ -1369,9 +1407,10 @@ a {
     max-height: 90vh;
   }
 
+  /* 태블릿에서도 히어로 카피는 배너 하단에 고정 */
   .hero_content {
-    top: calc(var(--header_height) + 40px);
-    bottom: auto;
+    top: auto;
+    bottom: 64px;
     left: var(--gutter);
     right: auto;
     width: min(640px, 100% - var(--gutter) * 2);
@@ -1383,13 +1422,6 @@ a {
 
   .hero_content h1 {
     font-size: clamp(18px, 2.4vw, 24px);
-  }
-
-  .locator_actions {
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 32px;
   }
 
   .button {
@@ -1407,15 +1439,39 @@ a {
     margin-bottom: 80px;
   }
 
+  /* 태블릿 이상: 좌측 열에 텍스트 + CTA, 우측 열에 지도 카드가 두 행에 걸친다 */
   .locator_layout {
     grid-template-columns: minmax(0, 1fr) minmax(0, 46%);
-    gap: 48px;
-    align-items: center;
+    grid-template-rows: auto 1fr;
+    gap: 0 48px;
+    align-items: start;
   }
 
-  /* 좌측 텍스트 그룹과 CTA 사이 수직 간격 */
+  .locator_text {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
   .locator_actions {
+    grid-column: 1;
+    grid-row: 2;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 32px;
+    /* 좌측 텍스트 그룹과 CTA 사이 수직 간격 */
     margin-top: 90px;
+  }
+
+  .locator_actions .button {
+    width: auto;
+    max-width: none;
+  }
+
+  .map_card {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
   }
 
   .feature_intro {
@@ -1493,7 +1549,7 @@ a {
   }
 
   .approach_detail {
-    margin-top: 120px;
+    padding-top: 120px;
   }
 
   .carousel_caption {
@@ -1622,7 +1678,7 @@ a {
   }
 
   .approach_detail {
-    margin-top: 180px;
+    padding-top: 180px;
   }
 
   .site_footer {
@@ -1661,7 +1717,7 @@ a {
   }
 
   .approach_detail {
-    margin-top: 64px;
+    padding-top: 64px;
   }
 
   .locator_intro {
@@ -1688,7 +1744,7 @@ a {
   }
 
   .approach_detail {
-    margin-top: 96px;
+    padding-top: 96px;
   }
 
   .site_footer {

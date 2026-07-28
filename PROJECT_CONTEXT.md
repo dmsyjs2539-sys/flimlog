@@ -204,6 +204,44 @@ mobile-first로 재구성. 브레이크포인트를 PRD 기준값 그대로 사�
 `threshold: 0.25` → `0.01` + `rootMargin: '0px 0px -12% 0px'`.
 문장이 뷰포트보다 길면 0.25에 도달하지 못해 트리거되지 않던 문제를 해소.
 
+### 모바일 문구 축약 · 순서 교정 · 하단 정렬 (2026-07-28)
+
+#### 구조 오류 수정
+
+`</main>`이 히어로 섹션 직후와 approach 섹션 뒤 **두 번** 있어, locator 이하 모든 섹션이 `<main>` 밖으로
+빠져 있었다. 앞쪽 `</main>`을 제거해 `main` 1개로 정리.
+
+#### 브레이크포인트별 문구 교체
+
+`.only_desktop` / `.only_mobile` 유틸리티 도입. `display: none`이라 스크린리더도 한쪽만 읽는다.
+
+| 위치 | 모바일 문구 |
+|---|---|
+| `.locator_body` | "필름이 가진 특유의 결을 ... 전문 현상소에 맡겨보세요." (2줄) |
+| `.feature_text` | "필름로그는 자판기를 통한 ... 모든 서비스를 제공합니다." (영문 문단은 모바일에서 숨김) |
+| `.approach_heading p` | "당신의 소중한 찰나가 온전한 추억으로 머물 수 있도록." |
+| `.approach_detail` | 3문단 → 1문단 축약 |
+
+#### 모바일 로케이터 순서
+
+`.locator_actions`를 `.locator_text` 밖으로 빼내 `.locator_layout`의 직계 자식으로 변경.
+
+- 모바일: `order`로 텍스트(1) → 지도(2) → CTA(3)
+- 768 이상: 명시적 `grid-column` / `grid-row`로 좌측 열에 텍스트 + CTA, 우측 열에 지도가 2행에 걸침
+- 모바일 CTA는 `max-width: 260px` + 가운데 정렬 (전체 폭 → 260px)
+
+#### 브랜드 스토리 하단 정렬 + 모바일 787px
+
+- `.approach_section`을 `align-items: stretch`, `.approach_content`를 `flex: 1` 세로 flex로 두고
+  `.approach_detail`에 `margin-top: auto` → 설명 텍스트와 Read More가 항상 하단에 붙는다.
+- 미디어쿼리의 `.approach_detail { margin-top }` 4곳을 `padding-top`으로 변경 (margin이면 auto를 덮어씀).
+- `.approach_content`에 걸려 있던 `min-height: inherit`가 패딩과 합쳐져 모바일 높이를 963px로
+  부풀리고 있었다. 제거 후 **정확히 787px**.
+
+#### 태블릿 히어로
+
+`.hero_content`가 768 구간에서 `top: header+40px`으로 상단 고정이던 것을 `bottom: 64px` 하단 고정으로 변경.
+
 ## 검증 결과
 
 브라우저 실측 (2026-07-27).
