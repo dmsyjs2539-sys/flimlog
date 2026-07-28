@@ -65,10 +65,13 @@
     </header>
 
     <main>
-      <!-- 히어로 배너: 배경 이미지 + 헤드라인/서브 텍스트만 (CTA는 아래 지도 섹션으로 분리) -->
+      <!-- 히어로 배너: 배경 영상 + 헤드라인/서브 텍스트만 (CTA는 아래 지도 섹션으로 분리) -->
       <section class="hero_section">
         <div class="hero_visual">
-          <img class="hero_image" src="assets/image/1.main%20image.png" alt="파도가 부서지는 필름 사진" />
+          <video class="hero_image" autoplay loop muted playsinline aria-label="필름감성영상">
+            <source src="assets/image/hero_video.mp4" type="video/mp4" />
+            브라우저가 비디오 태그를 지원하지 않습니다.
+          </video>
           <div class="hero_overlay"></div>
           <div class="hero_content">
             <p class="hero_caption">From Shutter to Print.</p>
@@ -76,328 +79,326 @@
           </div>
         </div>
       </section>
+    </main>
 
-      <!-- 히어로 하단 지도 섹션: 중앙 인트로 -> 좌측 텍스트 + CTA 2개 / 우측 지도 카드 -->
-      <section class="locator_section" id="service">
-        <div class="locator_intro">
-          <p class="locator_lead" data-letter_reveal>We keep your analog moments alive, anytime and anywhere through our
-            film booth</p>
-          <p class="section_subtitle">당신의 평범한 일상에 아날로그의 온도를 더하는 가장 쉽고 빠른 방법</p>
-        </div>
+    <!-- 히어로 하단 지도 섹션: 중앙 인트로 -> 좌측 텍스트 + CTA 2개 / 우측 지도 카드 -->
+    <section class="locator_section" id="service">
+      <div class="locator_intro">
+        <p class="locator_lead" data-letter_reveal>We keep your analog moments alive, anytime and anywhere through our
+          film booth</p>
+        <p class="section_subtitle">당신의 평범한 일상에 아날로그의 온도를 더하는 가장 쉽고 빠른 방법</p>
+      </div>
 
-        <div class="locator_layout">
-          <div class="locator_text">
-            <p class="eyebrow">AUTOMATIC FILM MACHINE &amp; DEVELOPING</p>
-            <h2>당신의 평범한 하루에 아날로그의 온도를 더하다.</h2>
-            <p class="locator_body">필름이 가진 특유의 결을 소중히 여기는 분들을 위해 준비했습니다. 진정한 가치는 속도가 아닌 깊이에서 온다는 것을 아는 사람들을 위해. 사진을 찍는
-              행위는 단순히
-              셔터를 누르는 것을 넘어, 기억을 손으로 만질 수 있는 형태로 간직하는 의미 있는 경험입니다. 가장 가까운 자판기에서 필름을 만나거나, 당신의 소중한 롤을 전문 현상소에 맡겨보세요.</p>
-            <div class="locator_actions">
-              <a class="button button_primary" href="#machine">
-                자판기 찾으러 가기
-                <svg class="icon_arrow" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
-                  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-                  focusable="false">
-                  <path d="M7 17L17 7" />
-                  <path d="M7 7H17V17" />
-                </svg>
-              </a>
-              <a class="button button_secondary" href="#store">
-                현상 접수 하러 가기
-                <svg class="icon_arrow" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
-                  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-                  focusable="false">
-                  <path d="M7 17L17 7" />
-                  <path d="M7 7H17V17" />
-                </svg>
-              </a>
-            </div>
-          </div>
-
-          <aside class="map_card" aria-label="가까운 필름로그 지점">
-            <div class="map_content">
-              <div class="map_image_wrapper">
-                <!-- TODO: PRD §7 - Kakao/Naver 지도 API 연동 시 이 목업 이미지를 대화형 지도 캔버스로 교체 -->
-                <img src="assets/image/2.map.png" alt="필름로그 지점 위치를 표시한 서울 지도" />
-              </div>
-              <div class="location_panel">
-                <h2>필름로그 서울 본점</h2>
-                <ul>
-                  <li>위치: 서울 중구 퇴계로 53길 6-17</li>
-                  <li>영업시간: 매일 13:00 - 17:00 / 자판기 24시</li>
-                </ul>
-                <a class="link_button" href="#">실시간 재고 확인하기</a>
-              </div>
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      <section class="feature_section" id="machine">
-        <div class="feature_intro">
-          <h2>처음이어도 괜찮아, 셔터를 누르는 순간부터</h2>
-          <p class="feature_intro_sub">필름을 고르고, 자판기를 거쳐, 당신의 화면에 사진이<br />맺히기까지의 아날로그 가이드.</p>
-        </div>
-        <div class="feature_text">
-          <p>필름로그는 자판기를 통한 필름 구매부터 전문 현상소의 스캔 인화, 업사이클 카메라까지 모든 서비스를 제공합니다.<br />사진을 찍는 행위를 넘어, 당신의 소중한 기록이 손에 안겨지는 추억으로
-            온전히 남도록 함께합니다.</p>
-          <p class="feature_text_en">We provide comprehensive analog services from film vending machines and lab
-            developing to upcycled cameras.</p>
-        </div>
-        <div class="feature_cards">
-          <article class="feature_card">
-            <img src="assets/image/3.filmbox.png" alt="필름 수거함에 필름을 넣는 모습" />
-            <div class="feature_card_body">
-              <span class="feature_index">01</span>
-              <h3>DEVELOPING &amp; SCANNING</h3>
-              <p>마지막 셔터를 누르셨나요? 밤하늘 아래 빛나는 수거함에 필름을 넣는 법부터, 당신의 폰으로 스캔본이 도착하기까지의 친절한 여정.</p>
-              <a class="read_more" href="#">Read more</a>
-            </div>
-          </article>
-          <article class="feature_card">
-            <img src="assets/image/4.upcycleing.PNG" alt="노란색 업사이클 일회용 필름 카메라" />
-            <div class="feature_card_body">
-              <span class="feature_index">02</span>
-              <h3>UPCYCLE CAMERA</h3>
-              <p>자판기에서 꺼낸 작은 카메라 한 대. 실패 없이 순간을 포착하는 법, 플래시를 켜야 하는 어둠의 타이밍을 알려드립니다.</p>
-              <a class="read_more" href="#">Read more</a>
-            </div>
-          </article>
-          <article class="feature_card">
-            <img src="assets/image/5.usertext.png" alt="필름로그 이용 안내서" />
-            <div class="feature_card_body">
-              <span class="feature_index">03</span>
-              <h3>HOW TO USE</h3>
-              <p>어려운 필름 용어부터 현상·스캔 이용 요금까지 한눈에. 필름로그 현상소를 처음 방문하는 분들을 위한 친절한 이용 안내서입니다.</p>
-              <a class="read_more" href="#">Read more</a>
-            </div>
-          </article>
-          <article class="feature_card">
-            <img src="assets/image/6.beach.png" alt="맑은 여름 바다를 담은 필름 사진" />
-            <div class="feature_card_body">
-              <span class="feature_index">04</span>
-              <h3>Kodak Ultramax 400</h3>
-              <p>햇살을 머금은 여름을 가장 정직하고 선명하게 담아냅니다. 파란 바다의 생동감과 구름의 입체감을 울트라맥스 400에 깊게 스며들게 해보세요.</p>
-              <a class="read_more" href="#">Read more</a>
-            </div>
-          </article>
-          <article class="feature_card">
-            <img src="assets/image/7.summer.png" alt="여름 추천 필름 3종" />
-            <div class="feature_card_body">
-              <span class="feature_index">05</span>
-              <h3>Summer Film Picks</h3>
-              <p>여름의 청량함을 담고 싶은 초보자분들을 위해, 색감별로 가장 사랑받는 필름 3가지를 추천해 드립니다. Choose Your Summer Vibe: Gold 200 · C200 ·
-                Yashica 400</p>
-              <a class="read_more" href="#">Read more</a>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="archive_section" id="store">
-        <div class="archive_grid">
-          <!-- 시안: 좌측 열에 소개글 - 제품 사진 - 특징 목록이 세로로 쌓인다 -->
-          <div class="archive_left">
-            <div class="archive_description">
-              <p class="eyebrow">[이달의 필름] Lomography Color Negative 35 mm ISO 100 - 영화같은 일상을 그리다</p>
-              <h2>일상의 온도, 필름으로<br />기록하는 우리의 시간</h2>
-            </div>
-            <div class="archive_media">
-              <img src="assets/image/8.filmcontent.png" alt="이달의 필름 로모그래피 컬러 네거티브 제품 사진" />
-            </div>
-            <div class="archive_details">
-              <p class="archive_highlight">햇살 가득한 날, 고운 입자의 필름으로 당신의 가장 눈부신 순간을 영화처럼.</p>
-              <ul>
-                <li>컬러 네거티브 필름 중 가장 부드러운 오퍼레이터</li>
-                <li>ISO 100의 낮은 광감도</li>
-                <li>생생한 색감과 미세한 그레인 입자</li>
-                <li>친화적인 가격에 프로페셔널한 결과물</li>
-                <li>햇빛이 좋은 맑은 날씨에 인상적인 디테일의 사진</li>
-              </ul>
-              <a class="read_more button_accent" href="#">Read more</a>
-            </div>
-          </div>
-          <!-- 이전/다음 버튼과 썸네일 4장이 같은 인덱스를 공유하며 순환한다 -->
-          <div class="archive_side" id="archive_slider">
-            <div class="archive_side_main">
-              <ul class="archive_stage">
-                <li class="archive_frame is_active">
-                  <img src="assets/image/9.mainbest.jpg" alt="담장 위에서 하늘을 올려다보는 고양이를 담은 필름 사진" />
-                </li>
-                <li class="archive_frame">
-                  <img src="assets/image/10.img1.png" alt="담벼락에 드리운 빛과 그림자를 담은 필름 사진" />
-                </li>
-                <li class="archive_frame">
-                  <img src="assets/image/11.img2.jpg" alt="놀이공원 대관람차를 담은 필름 사진" />
-                </li>
-                <li class="archive_frame">
-                  <img src="assets/image/12.img3.jpg" alt="담장 위를 걷는 고양이를 담은 필름 사진" />
-                </li>
-                <li class="archive_frame">
-                  <img src="assets/image/13.img4.jpg" alt="꽃이 핀 정원을 담은 필름 사진" />
-                </li>
-              </ul>
-              <div class="archive_side_nav">
-                <button type="button" class="archive_nav_button" data-archive_step="-1" aria-label="이전 사진">
-                  <img src="assets/figma/left-arrow.svg" alt="" />
-                </button>
-                <button type="button" class="archive_nav_button" data-archive_step="1" aria-label="다음 사진">
-                  <img src="assets/figma/right-arrow.svg" alt="" />
-                </button>
-              </div>
-              <img class="archive_side_scroll" src="assets/figma/scroll.svg" alt="" />
-            </div>
-            <ul class="archive_thumbs">
-              <li><button type="button" class="archive_thumb is_active" data-archive_index="1" aria-label="1번 사진 보기">
-                  <img src="assets/image/10.img1.png" alt="" />
-                </button></li>
-              <li><button type="button" class="archive_thumb" data-archive_index="2" aria-label="2번 사진 보기">
-                  <img src="assets/image/11.img2.jpg" alt="" />
-                </button></li>
-              <li><button type="button" class="archive_thumb" data-archive_index="3" aria-label="3번 사진 보기">
-                  <img src="assets/image/12.img3.jpg" alt="" />
-                </button></li>
-              <li><button type="button" class="archive_thumb" data-archive_index="4" aria-label="4번 사진 보기">
-                  <img src="assets/image/13.img4.jpg" alt="" />
-                </button></li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section class="gallery_section" id="story">
-        <div class="gallery_layout">
-          <!-- 좌측: 고정 레이아웃. [FILM ARCHIVE] 값만 캐러셀 상태에 따라 갱신 -->
-          <div class="gallery_info">
-            <h2>이번 주의 시선: 가장 사랑받은 기록</h2>
-            <p class="gallery_description">필름로그 유저들이 카메라에 셔터를 누르고, 현상소를 거쳐 온전한 추억으로 남겨온 이 달의 가장 아름다운 찰나입니다.<br />당신이 마주한
-              오늘
-              하루도 누군가에게는 영원히 기억될 하나의 프레임이 됩니다.</p>
-            <dl class="archive_meta" aria-live="polite">
-              <p class="archive_meta_label">[FILM ARCHIVE]</p>
-              <div class="archive_meta_row">
-                <dt>Camera</dt>
-                <dd data-slide_field="camera">Canon AE-1</dd>
-              </div>
-              <div class="archive_meta_row">
-                <dt>Film</dt>
-                <dd data-slide_field="film">Kodak Ektar 100</dd>
-              </div>
-              <div class="archive_meta_row">
-                <dt>Photo by</dt>
-                <dd data-slide_field="author">@lomorukart888</dd>
-              </div>
-            </dl>
-            <a class="more_gallery" href="#">
-              more Gallery
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <div class="locator_layout">
+        <div class="locator_text">
+          <p class="eyebrow">AUTOMATIC FILM MACHINE &amp; DEVELOPING</p>
+          <h2>당신의 평범한 하루에 아날로그의 온도를 더하다.</h2>
+          <p class="locator_body">필름이 가진 특유의 결을 소중히 여기는 분들을 위해 준비했습니다. 진정한 가치는 속도가 아닌 깊이에서 온다는 것을 아는 사람들을 위해. 사진을 찍는
+            행위는 단순히
+            셔터를 누르는 것을 넘어, 기억을 손으로 만질 수 있는 형태로 간직하는 의미 있는 경험입니다. 가장 가까운 자판기에서 필름을 만나거나, 당신의 소중한 롤을 전문 현상소에 맡겨보세요.</p>
+          <div class="locator_actions">
+            <a class="button button_primary" href="#machine">
+              자판기 찾으러 가기
+              <svg class="icon_arrow" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M7 17L17 7" />
+                <path d="M7 7H17V17" />
+              </svg>
+            </a>
+            <a class="button button_secondary" href="#store">
+              현상 접수 하러 가기
+              <svg class="icon_arrow" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                 <path d="M7 17L17 7" />
                 <path d="M7 7H17V17" />
               </svg>
             </a>
           </div>
+        </div>
 
-          <!-- 우측: 카드형 가로 캐러셀 -->
-          <div class="gallery_carousel">
-            <div class="carousel_viewport">
-              <ul class="carousel_track" id="carousel_track">
-                <li class="carousel_slide" data-slide_index="01" data-slide_camera="Canon AE-1"
-                  data-slide_film="Kodak Ektar 100" data-slide_author="@lomorukart888" data-slide_title="모자와 여름"
-                  data-slide_likes="128">
-                  <img src="assets/image/14.best1.jpg" alt="모자를 쓴 아이를 담은 필름 사진" />
-                </li>
-                <li class="carousel_slide" data-slide_index="02" data-slide_camera="Nikon FM2"
-                  data-slide_film="Kodak Gold 200" data-slide_author="@filmlog_daily" data-slide_title="분홍이 번지는 자리"
-                  data-slide_likes="96">
-                  <img src="assets/image/15.best2.jpg" alt="분홍 꽃무리를 담은 필름 사진" />
-                </li>
-                <li class="carousel_slide" data-slide_index="03" data-slide_camera="Pentax MX"
-                  data-slide_film="Fujifilm C200" data-slide_author="@grain_and_sea" data-slide_title="바다 위의 오후"
-                  data-slide_likes="74">
-                  <img src="assets/image/16.best3.jpg" alt="갈매기가 나는 바닷가를 담은 필름 사진" />
-                </li>
-                <li class="carousel_slide" data-slide_index="04" data-slide_camera="Olympus MJU II"
-                  data-slide_film="Kodak Ultramax 400" data-slide_author="@slow_shutter_kr" data-slide_title="물빛 위의 산책"
-                  data-slide_likes="61">
-                  <img src="assets/image/17.best4.PNG" alt="물가 풍경을 담은 필름 사진" />
-                </li>
-                <li class="carousel_slide" data-slide_index="05" data-slide_camera="Rollei 35"
-                  data-slide_film="Lomography Color Negative 100" data-slide_author="@analog_desk"
-                  data-slide_title="손끝의 기록" data-slide_likes="88">
-                  <img src="assets/image/18.best5.PNG" alt="필름 카메라를 든 손을 담은 필름 사진" />
-                </li>
-                <li class="carousel_slide" data-slide_index="06" data-slide_camera="Minolta X-700"
-                  data-slide_film="Kodak Portra 400" data-slide_author="@one_more_roll" data-slide_title="여름의 주황"
-                  data-slide_likes="112">
-                  <img src="assets/image/20.best6.PNG" alt="주황색 백합을 담은 필름 사진" />
-                </li>
+        <aside class="map_card" aria-label="가까운 필름로그 지점">
+          <div class="map_content">
+            <div class="map_image_wrapper">
+              <!-- TODO: PRD §7 - Kakao/Naver 지도 API 연동 시 이 목업 이미지를 대화형 지도 캔버스로 교체 -->
+              <img src="assets/image/2.map.png" alt="필름로그 지점 위치를 표시한 서울 지도" />
+            </div>
+            <div class="location_panel">
+              <h2>필름로그 서울 본점</h2>
+              <ul>
+                <li>위치: 서울 중구 퇴계로 53길 6-17</li>
+                <li>영업시간: 매일 13:00 - 17:00 / 자판기 24시</li>
               </ul>
-
-              <div class="carousel_caption" aria-live="polite">
-                <span class="carousel_caption_index" data-slide_field="index">01</span>
-                <p class="carousel_caption_title" data-slide_field="title">모자와 여름</p>
-                <p class="carousel_caption_likes">
-                  <svg class="icon_heart" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"
-                    aria-hidden="true" focusable="false">
-                    <path d="M12 21s-7.5-4.7-9.3-9A5.4 5.4 0 0 1 12 6.2 5.4 5.4 0 0 1 21.3 12c-1.8 4.3-9.3 9-9.3 9z" />
-                  </svg>
-                  <span class="visually_hidden">좋아요</span>
-                  <span data-slide_field="likes">128</span>
-                </p>
-              </div>
-            </div>
-
-            <div class="carousel_controls">
-              <button type="button" class="carousel_button" data-carousel_step="-1" aria-label="이전 사진">
-                <img src="assets/figma/left-arrow.svg" alt="" />
-              </button>
-              <p class="carousel_status">
-                <span data-slide_field="index">01</span> / <span class="carousel_total">06</span>
-              </p>
-              <button type="button" class="carousel_button" data-carousel_step="1" aria-label="다음 사진">
-                <img src="assets/figma/right-arrow.svg" alt="" />
-              </button>
+              <a class="link_button" href="#">실시간 재고 확인하기</a>
             </div>
           </div>
-        </div>
-      </section>
+        </aside>
+      </div>
+    </section>
 
-      <section class="approach_section" id="approach">
-        <!-- 키워드 클릭/자동 롤링에 따라 브랜드 이미지가 교차 페이드된다 -->
-        <div class="approach_background" id="approach_background">
-          <img class="approach_image is_active" src="assets/image/21.brand1.jpg" alt="처마 아래 걸린 유리 풍경"
-            data-story_key="grain" />
-          <img class="approach_image" src="assets/image/22.brand2.png" alt="필름 자판기 앞에 선 사람"
-            data-story_key="connection" />
-          <img class="approach_image" src="assets/image/23.21.brand3.png" alt="책상 위에 놓인 필름 카메라들"
-            data-story_key="creation" />
-          <div class="approach_overlay"></div>
-        </div>
-        <div class="approach_content">
-          <div class="approach_heading">
-            <h2>우리는 옛 향수가 아닌, 내일의 필름을 이야기합니다.</h2>
-            <p>느리고 서툰 필름을 손에 쥐는 마음을 압니다. 당신의 소중한 찰나가 온전한 추억으로<br />머물 수 있도록, 필름로그만의 지속 가능한 기록을 제안합니다.</p>
+    <section class="feature_section" id="machine">
+      <div class="feature_intro">
+        <h2>처음이어도 괜찮아, 셔터를 누르는 순간부터</h2>
+        <p class="feature_intro_sub">필름을 고르고, 자판기를 거쳐, 당신의 화면에 사진이<br />맺히기까지의 아날로그 가이드.</p>
+      </div>
+      <div class="feature_text">
+        <p>필름로그는 자판기를 통한 필름 구매부터 전문 현상소의 스캔 인화, 업사이클 카메라까지 모든 서비스를 제공합니다.<br />사진을 찍는 행위를 넘어, 당신의 소중한 기록이 손에 안겨지는 추억으로
+          온전히 남도록 함께합니다.</p>
+        <p class="feature_text_en">We provide comprehensive analog services from film vending machines and lab
+          developing to upcycled cameras.</p>
+      </div>
+      <div class="feature_cards">
+        <article class="feature_card">
+          <img src="assets/image/3.filmbox.png" alt="필름 수거함에 필름을 넣는 모습" />
+          <div class="feature_card_body">
+            <span class="feature_index">01</span>
+            <h3>DEVELOPING &amp; SCANNING</h3>
+            <p>마지막 셔터를 누르셨나요? 밤하늘 아래 빛나는 수거함에 필름을 넣는 법부터, 당신의 폰으로 스캔본이 도착하기까지의 친절한 여정.</p>
+            <a class="read_more" href="#">Read more</a>
           </div>
-          <ul class="approach_list" id="approach_list">
-            <li><button type="button" class="approach_key is_active" data-story_key="grain"
-                aria-pressed="true">Grain</button></li>
-            <li><button type="button" class="approach_key" data-story_key="connection"
-                aria-pressed="false">Connection</button></li>
-            <li><button type="button" class="approach_key" data-story_key="creation"
-                aria-pressed="false">Creation</button></li>
-          </ul>
-          <div class="approach_detail">
-            <p class="approach_detail_label">[ Future of Analogue ]</p>
-            <p>스마트폰 하나로 원하는 색감을 손쉽게 얻는 시대. 그럼에도 편리함 대신 굳이 느리고 서툰 필름을 손에 쥐는 이들이 있습니다.</p>
-            <p>손끝으로 전해지는 필름의 미세한 입자감과 아날로그 고유의 따뜻한 물성은, 디지털 기술이 결코 채워주지 못하는 독보적인 감각을 선물합니다.</p>
-            <p>필름로그는 이처럼 쉽게 대체될 수 없는 가치를 알아보고, 자신만의 고유한 안목으로 순간을 기록해 나가는 이 시대의 가장 감각적인 이들을 위해 움직입니다.</p>
+        </article>
+        <article class="feature_card">
+          <img src="assets/image/4.upcycleing.PNG" alt="노란색 업사이클 일회용 필름 카메라" />
+          <div class="feature_card_body">
+            <span class="feature_index">02</span>
+            <h3>UPCYCLE CAMERA</h3>
+            <p>자판기에서 꺼낸 작은 카메라 한 대. 실패 없이 순간을 포착하는 법, 플래시를 켜야 하는 어둠의 타이밍을 알려드립니다.</p>
+            <a class="read_more" href="#">Read more</a>
           </div>
-          <div class="approach_action">
+        </article>
+        <article class="feature_card">
+          <img src="assets/image/5.usertext.png" alt="필름로그 이용 안내서" />
+          <div class="feature_card_body">
+            <span class="feature_index">03</span>
+            <h3>HOW TO USE</h3>
+            <p>어려운 필름 용어부터 현상·스캔 이용 요금까지 한눈에. 필름로그 현상소를 처음 방문하는 분들을 위한 친절한 이용 안내서입니다.</p>
+            <a class="read_more" href="#">Read more</a>
+          </div>
+        </article>
+        <article class="feature_card">
+          <img src="assets/image/6.beach.png" alt="맑은 여름 바다를 담은 필름 사진" />
+          <div class="feature_card_body">
+            <span class="feature_index">04</span>
+            <h3>Kodak Ultramax 400</h3>
+            <p>햇살을 머금은 여름을 가장 정직하고 선명하게 담아냅니다. 파란 바다의 생동감과 구름의 입체감을 울트라맥스 400에 깊게 스며들게 해보세요.</p>
+            <a class="read_more" href="#">Read more</a>
+          </div>
+        </article>
+        <article class="feature_card">
+          <img src="assets/image/7.summer.png" alt="여름 추천 필름 3종" />
+          <div class="feature_card_body">
+            <span class="feature_index">05</span>
+            <h3>Summer Film Picks</h3>
+            <p>여름의 청량함을 담고 싶은 초보자분들을 위해, 색감별로 가장 사랑받는 필름 3가지를 추천해 드립니다. Choose Your Summer Vibe: Gold 200 · C200 ·
+              Yashica 400</p>
+            <a class="read_more" href="#">Read more</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="archive_section" id="store">
+      <div class="archive_grid">
+        <!-- 시안: 좌측 열에 소개글 - 제품 사진 - 특징 목록이 세로로 쌓인다 -->
+        <div class="archive_left">
+          <div class="archive_description">
+            <p class="eyebrow">[이달의 필름] Lomography Color Negative 35 mm ISO 100 - 영화같은 일상을 그리다</p>
+            <h2>일상의 온도, 필름으로<br />기록하는 우리의 시간</h2>
+          </div>
+          <div class="archive_media">
+            <img src="assets/image/8.filmcontent.png" alt="이달의 필름 로모그래피 컬러 네거티브 제품 사진" />
+          </div>
+          <div class="archive_details">
+            <p class="archive_highlight">햇살 가득한 날, 고운 입자의 필름으로 당신의 가장 눈부신 순간을 영화처럼.</p>
+            <ul>
+              <li>컬러 네거티브 필름 중 가장 부드러운 오퍼레이터</li>
+              <li>ISO 100의 낮은 광감도</li>
+              <li>생생한 색감과 미세한 그레인 입자</li>
+              <li>친화적인 가격에 프로페셔널한 결과물</li>
+              <li>햇빛이 좋은 맑은 날씨에 인상적인 디테일의 사진</li>
+            </ul>
             <a class="read_more button_accent" href="#">Read more</a>
           </div>
         </div>
-      </section>
+        <!-- 이전/다음 버튼과 썸네일 4장이 같은 인덱스를 공유하며 순환한다 -->
+        <div class="archive_side" id="archive_slider">
+          <div class="archive_side_main">
+            <ul class="archive_stage">
+              <li class="archive_frame is_active">
+                <img src="assets/image/9.mainbest.jpg" alt="담장 위에서 하늘을 올려다보는 고양이를 담은 필름 사진" />
+              </li>
+              <li class="archive_frame">
+                <img src="assets/image/10.img1.png" alt="담벼락에 드리운 빛과 그림자를 담은 필름 사진" />
+              </li>
+              <li class="archive_frame">
+                <img src="assets/image/11.img2.jpg" alt="놀이공원 대관람차를 담은 필름 사진" />
+              </li>
+              <li class="archive_frame">
+                <img src="assets/image/12.img3.jpg" alt="담장 위를 걷는 고양이를 담은 필름 사진" />
+              </li>
+              <li class="archive_frame">
+                <img src="assets/image/13.img4.jpg" alt="꽃이 핀 정원을 담은 필름 사진" />
+              </li>
+            </ul>
+            <div class="archive_side_nav">
+              <button type="button" class="archive_nav_button" data-archive_step="-1" aria-label="이전 사진">
+                <img src="assets/figma/left-arrow.svg" alt="" />
+              </button>
+              <button type="button" class="archive_nav_button" data-archive_step="1" aria-label="다음 사진">
+                <img src="assets/figma/right-arrow.svg" alt="" />
+              </button>
+            </div>
+            <img class="archive_side_scroll" src="assets/figma/scroll.svg" alt="" />
+          </div>
+          <ul class="archive_thumbs">
+            <li><button type="button" class="archive_thumb is_active" data-archive_index="1" aria-label="1번 사진 보기">
+                <img src="assets/image/10.img1.png" alt="" />
+              </button></li>
+            <li><button type="button" class="archive_thumb" data-archive_index="2" aria-label="2번 사진 보기">
+                <img src="assets/image/11.img2.jpg" alt="" />
+              </button></li>
+            <li><button type="button" class="archive_thumb" data-archive_index="3" aria-label="3번 사진 보기">
+                <img src="assets/image/12.img3.jpg" alt="" />
+              </button></li>
+            <li><button type="button" class="archive_thumb" data-archive_index="4" aria-label="4번 사진 보기">
+                <img src="assets/image/13.img4.jpg" alt="" />
+              </button></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="gallery_section" id="story">
+      <div class="gallery_layout">
+        <!-- 좌측: 고정 레이아웃. [FILM ARCHIVE] 값만 캐러셀 상태에 따라 갱신 -->
+        <div class="gallery_info">
+          <h2>이번 주의 시선: 가장 사랑받은 기록</h2>
+          <p class="gallery_description">필름로그 유저들이 카메라에 셔터를 누르고, 현상소를 거쳐 온전한 추억으로 남겨온 이 달의 가장 아름다운 찰나입니다.<br />당신이 마주한
+            오늘
+            하루도 누군가에게는 영원히 기억될 하나의 프레임이 됩니다.</p>
+          <dl class="archive_meta" aria-live="polite">
+            <p class="archive_meta_label">[FILM ARCHIVE]</p>
+            <div class="archive_meta_row">
+              <dt>Camera</dt>
+              <dd data-slide_field="camera">Canon AE-1</dd>
+            </div>
+            <div class="archive_meta_row">
+              <dt>Film</dt>
+              <dd data-slide_field="film">Kodak Ektar 100</dd>
+            </div>
+            <div class="archive_meta_row">
+              <dt>Photo by</dt>
+              <dd data-slide_field="author">@lomorukart888</dd>
+            </div>
+          </dl>
+          <a class="more_gallery" href="#">
+            more Gallery
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M7 17L17 7" />
+              <path d="M7 7H17V17" />
+            </svg>
+          </a>
+        </div>
+
+        <!-- 우측: 카드형 가로 캐러셀 -->
+        <div class="gallery_carousel">
+          <div class="carousel_viewport">
+            <ul class="carousel_track" id="carousel_track">
+              <li class="carousel_slide" data-slide_index="01" data-slide_camera="Canon AE-1"
+                data-slide_film="Kodak Ektar 100" data-slide_author="@lomorukart888" data-slide_title="모자와 여름"
+                data-slide_likes="128">
+                <img src="assets/image/14.best1.jpg" alt="모자를 쓴 아이를 담은 필름 사진" />
+              </li>
+              <li class="carousel_slide" data-slide_index="02" data-slide_camera="Nikon FM2"
+                data-slide_film="Kodak Gold 200" data-slide_author="@filmlog_daily" data-slide_title="분홍이 번지는 자리"
+                data-slide_likes="96">
+                <img src="assets/image/15.best2.jpg" alt="분홍 꽃무리를 담은 필름 사진" />
+              </li>
+              <li class="carousel_slide" data-slide_index="03" data-slide_camera="Pentax MX"
+                data-slide_film="Fujifilm C200" data-slide_author="@grain_and_sea" data-slide_title="바다 위의 오후"
+                data-slide_likes="74">
+                <img src="assets/image/16.best3.jpg" alt="갈매기가 나는 바닷가를 담은 필름 사진" />
+              </li>
+              <li class="carousel_slide" data-slide_index="04" data-slide_camera="Olympus MJU II"
+                data-slide_film="Kodak Ultramax 400" data-slide_author="@slow_shutter_kr" data-slide_title="물빛 위의 산책"
+                data-slide_likes="61">
+                <img src="assets/image/17.best4.PNG" alt="물가 풍경을 담은 필름 사진" />
+              </li>
+              <li class="carousel_slide" data-slide_index="05" data-slide_camera="Rollei 35"
+                data-slide_film="Lomography Color Negative 100" data-slide_author="@analog_desk"
+                data-slide_title="손끝의 기록" data-slide_likes="88">
+                <img src="assets/image/18.best5.PNG" alt="필름 카메라를 든 손을 담은 필름 사진" />
+              </li>
+              <li class="carousel_slide" data-slide_index="06" data-slide_camera="Minolta X-700"
+                data-slide_film="Kodak Portra 400" data-slide_author="@one_more_roll" data-slide_title="여름의 주황"
+                data-slide_likes="112">
+                <img src="assets/image/20.best6.PNG" alt="주황색 백합을 담은 필름 사진" />
+              </li>
+            </ul>
+
+            <div class="carousel_caption" aria-live="polite">
+              <span class="carousel_caption_index" data-slide_field="index">01</span>
+              <p class="carousel_caption_title" data-slide_field="title">모자와 여름</p>
+              <p class="carousel_caption_likes">
+                <svg class="icon_heart" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"
+                  aria-hidden="true" focusable="false">
+                  <path d="M12 21s-7.5-4.7-9.3-9A5.4 5.4 0 0 1 12 6.2 5.4 5.4 0 0 1 21.3 12c-1.8 4.3-9.3 9-9.3 9z" />
+                </svg>
+                <span class="visually_hidden">좋아요</span>
+                <span data-slide_field="likes">128</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="carousel_controls">
+            <button type="button" class="carousel_button" data-carousel_step="-1" aria-label="이전 사진">
+              <img src="assets/figma/left-arrow.svg" alt="" />
+            </button>
+            <p class="carousel_status">
+              <span data-slide_field="index">01</span> / <span class="carousel_total">06</span>
+            </p>
+            <button type="button" class="carousel_button" data-carousel_step="1" aria-label="다음 사진">
+              <img src="assets/figma/right-arrow.svg" alt="" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="approach_section" id="approach">
+      <!-- 키워드 클릭/자동 롤링에 따라 브랜드 이미지가 교차 페이드된다 -->
+      <div class="approach_background" id="approach_background">
+        <img class="approach_image is_active" src="assets/image/21.brand1.jpg" alt="처마 아래 걸린 유리 풍경"
+          data-story_key="grain" />
+        <img class="approach_image" src="assets/image/22.brand2.png" alt="필름 자판기 앞에 선 사람" data-story_key="connection" />
+        <img class="approach_image" src="assets/image/23.21.brand3.png" alt="책상 위에 놓인 필름 카메라들"
+          data-story_key="creation" />
+        <div class="approach_overlay"></div>
+      </div>
+      <div class="approach_content">
+        <div class="approach_heading">
+          <h2>우리는 옛 향수가 아닌, 내일의 필름을 이야기합니다.</h2>
+          <p>느리고 서툰 필름을 손에 쥐는 마음을 압니다. 당신의 소중한 찰나가 온전한 추억으로<br />머물 수 있도록, 필름로그만의 지속 가능한 기록을 제안합니다.</p>
+        </div>
+        <ul class="approach_list" id="approach_list">
+          <li><button type="button" class="approach_key is_active" data-story_key="grain"
+              aria-pressed="true">Grain</button></li>
+          <li><button type="button" class="approach_key" data-story_key="connection"
+              aria-pressed="false">Connection</button></li>
+          <li><button type="button" class="approach_key" data-story_key="creation"
+              aria-pressed="false">Creation</button></li>
+        </ul>
+        <div class="approach_detail">
+          <p class="approach_detail_label">[ Future of Analogue ]</p>
+          <p>스마트폰 하나로 원하는 색감을 손쉽게 얻는 시대. 그럼에도 편리함 대신 굳이 느리고 서툰 필름을 손에 쥐는 이들이 있습니다.</p>
+          <p>손끝으로 전해지는 필름의 미세한 입자감과 아날로그 고유의 따뜻한 물성은, 디지털 기술이 결코 채워주지 못하는 독보적인 감각을 선물합니다.</p>
+          <p>필름로그는 이처럼 쉽게 대체될 수 없는 가치를 알아보고, 자신만의 고유한 안목으로 순간을 기록해 나가는 이 시대의 가장 감각적인 이들을 위해 움직입니다.</p>
+        </div>
+        <div class="approach_action">
+          <a class="read_more button_accent" href="#">Read more</a>
+        </div>
+      </div>
+    </section>
     </main>
 
     <footer class="site_footer">
