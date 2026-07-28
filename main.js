@@ -270,114 +270,137 @@
   }
 
   /* -------------------------------------------------------
-     피처 카드 레일: 스크롤바는 숨기고 세로 휠 / 드래그로 가로 스크롤
+     문구 반응형 교체: HTML에는 데스크톱 문구 한 벌만 두고
+     data-text_mobile 값으로 모바일 문구를 갈아끼운다.
+     값이 빈 문자열이면 모바일에서 감춘다.
      ------------------------------------------------------- */
-  function initFeatureRail() {
+  function initResponsiveText() {
+    var targets = Array.prototype.slice.call(document.querySelectorAll('[data-text_mobile]'));
+
+    if (!targets.length) {
+      return;
+    }
+
+    var desktopQuery = window.matchMedia('(min-width: 768px)');
+
+    targets.forEach(function (target) {
+      target.setAttribute('data-text_desktop', target.textContent.replace(/\s+/g, ' ').trim());
+    });
+
+    function applyText() {
+      var isDesktop = desktopQuery.matches;
+
+      targets.forEach(function (target) {
+        var mobileText = target.getAttribute('data-text_mobile');
+        var desktopText = target.getAttribute('data-text_desktop');
+
+        if (isDesktop) {
+          target.textContent = desktopText;
+          target.hidden = false;
+          return;
+        }
+
+        target.hidden = mobileText === '';
+        target.textContent = mobileText;
+      });
+    }
+
+    if (typeof desktopQuery.addEventListener === 'function') {
+      desktopQuery.addEventListener('change', applyText);
+    } else {
+      desktopQuery.addListener(applyText);
+    }
+
+    applyText();
+  }
+
+  /* -------------------------------------------------------
+     피처 카드 레일
+     - 768px 이상: 카드 세트를 복제해 끊김 없이 흐르는 무한 마퀴
+     - 767px 이하: sticky 스택이라 JS 개입 없이 페이지 스크롤만 사용
+     ------------------------------------------------------- */
+  function initFeatureMarquee() {
     var rail = document.querySelector('.feature_cards');
 
     if (!rail) {
       return;
     }
 
-    function canScroll() {
-      return rail.scrollWidth > rail.clientWidth + 1;
+    var desktopQuery = window.matchMedia('(min-width: 768px)');
+    var reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var originals = Array.prototype.slice.call(rail.querySelectorAll('.feature_card'));
+
+    if (!originals.length) {
+      return;
     }
 
-    function syncDraggableState() {
-      rail.classList.toggle('is_draggable', canScroll());
-    }
-
-    /* 세로 휠을 가로 스크롤로 매핑. 레일 끝에서는 페이지 스크롤로 넘긴다. */
-    rail.addEventListener(
-      'wheel',
-      function (event) {
-        if (!canScroll() || event.ctrlKey) {
-          return;
-        }
-
-        var delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
-
-        if (delta === 0) {
-          return;
-        }
-
-        var atStart = rail.scrollLeft <= 0;
-        var atEnd = rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 1;
-
-        if ((delta < 0 && atStart) || (delta > 0 && atEnd)) {
-          return;
-        }
-
-        event.preventDefault();
-        rail.scrollLeft += delta;
-      },
-      { passive: false }
-    );
-
-    /* 포인터 드래그로 밀어서 스크롤 */
-    var isDragging = false;
-    var startX = 0;
-    var startScrollLeft = 0;
-    var hasMoved = false;
-
-    rail.addEventListener('pointerdown', function (event) {
-      if (event.pointerType === 'touch' || !canScroll()) {
-        return;
-      }
-
-      isDragging = true;
-      hasMoved = false;
-      startX = event.clientX;
-      startScrollLeft = rail.scrollLeft;
-      rail.setPointerCapture(event.pointerId);
-      rail.classList.add('is_dragging');
+    /* 원본 카드를 감싸는 트랙을 만들고 그 뒤에 같은 세트를 한 벌 복제해 붙인다.
+       복제본은 보조기기와 탭 순서에서 제외한다. */
+    var marquee = document.createElement('div');
+    marquee.className = 'feature_marquee';
+    rail.insertBefore(marquee, originals[0]);
+    originals.forEach(function (card) {
+      marquee.appendChild(card);
     });
 
-    rail.addEventListener('pointermove', function (event) {
-      if (!isDragging) {
-        return;
-      }
+    var clones = originals.map(function (card) {
+      var clone = card.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      clone.classList.add('is_clone');
 
-      var distance = event.clientX - startX;
+      Array.prototype.slice.call(clone.querySelectorAll('a, button')).forEach(function (node) {
+        node.setAttribute('tabindex', '-1');
+      });
 
-      if (Math.abs(distance) > 3) {
-        hasMoved = true;
-      }
-
-      rail.scrollLeft = startScrollLeft - distance;
+      marquee.appendChild(clone);
+      return clone;
     });
 
-    function endDrag(event) {
-      if (!isDragging) {
+    var SPEED_PX_PER_SECOND = 55;
+
+    function measure() {
+      if (!desktopQuery.matches || reducedMotionQuery.matches) {
+        marquee.classList.remove('is_running');
+        marquee.style.removeProperty('--marquee_shift');
+        marquee.style.removeProperty('--marquee_duration');
         return;
       }
 
-      isDragging = false;
-      rail.classList.remove('is_dragging');
+      /* 원본 세트의 총 폭(마지막 카드 오른쪽 - 첫 카드 왼쪽 + gap)만큼 이동하면
+         복제본 첫 카드가 정확히 원본 첫 카드 자리에 오면서 이음매가 사라진다. */
+      var gap = parseFloat(window.getComputedStyle(marquee).columnGap) || 0;
+      var shift = 0;
 
-      if (rail.hasPointerCapture && rail.hasPointerCapture(event.pointerId)) {
-        rail.releasePointerCapture(event.pointerId);
+      originals.forEach(function (card) {
+        shift += card.getBoundingClientRect().width + gap;
+      });
+
+      if (shift <= 0) {
+        return;
       }
+
+      marquee.style.setProperty('--marquee_shift', shift + 'px');
+      marquee.style.setProperty('--marquee_duration', shift / SPEED_PX_PER_SECOND + 's');
+      marquee.classList.add('is_running');
     }
 
-    rail.addEventListener('pointerup', endDrag);
-    rail.addEventListener('pointercancel', endDrag);
+    var resizeTimer;
 
-    /* 드래그로 끝난 클릭은 링크 이동으로 이어지지 않게 막는다 */
-    rail.addEventListener(
-      'click',
-      function (event) {
-        if (hasMoved) {
-          event.preventDefault();
-          event.stopPropagation();
-          hasMoved = false;
-        }
-      },
-      true
-    );
+    window.addEventListener('resize', function () {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(measure, 180);
+    });
 
-    syncDraggableState();
-    window.addEventListener('resize', syncDraggableState);
+    if (typeof reducedMotionQuery.addEventListener === 'function') {
+      reducedMotionQuery.addEventListener('change', measure);
+      desktopQuery.addEventListener('change', measure);
+    }
+
+    /* 이미지 로딩 후 폭이 확정되므로 한 번 더 잰다 */
+    window.addEventListener('load', measure);
+    measure();
+
+    return clones;
   }
 
   /* -------------------------------------------------------
@@ -537,9 +560,10 @@
 
   initHeader();
   initMobileHeader();
+  initResponsiveText();
   initGalleryCarousel();
   initArchiveSlider();
-  initFeatureRail();
+  initFeatureMarquee();
   initLetterReveal();
   initBrandStory();
 })();

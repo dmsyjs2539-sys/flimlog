@@ -242,6 +242,39 @@ mobile-first로 재구성. 브레이크포인트를 PRD 기준값 그대로 사�
 
 `.hero_content`가 768 구간에서 `top: header+40px`으로 상단 고정이던 것을 `bottom: 64px` 하단 고정으로 변경.
 
+### 마퀴 · sticky 스택 · 문구 JS 통합 (2026-07-28)
+
+#### 피처 카드: 브레이크포인트별 완전히 다른 인터랙션
+
+| 구간 | 동작 |
+|---|---|
+| ≥768 | 무한 자동 가로 스크롤(마퀴). `main.js`가 카드 5장을 한 벌 복제해 붙이고 원본 세트 폭을 `--marquee_shift`로 넣는다. `translate3d(-shift)` 지점에서 복제본 1번이 원본 1번 자리에 오므로 이음매가 없다. 속도 55px/s, hover·focus-within 시 `animation-play-state: paused`. |
+| <768 | `position: sticky` + z-index 1~5 스택. 스크롤하면 카드가 차곡차곡 포개지고 올리면 벗겨진다. |
+
+- 복제본은 `aria-hidden="true"` + 내부 링크 `tabindex="-1"`, 모바일에서는 `display: none`.
+- 기존 휠/드래그 가로 스크롤 로직(`initFeatureRail`)은 마퀴로 대체되어 **삭제**했다.
+- 모바일 스크롤 미동작 원인이었던 `overflow-x: auto` + 포인터 드래그 핸들러를 제거하고
+  `.feature_cards`를 `display: block` + `touch-action: pan-y`로 되돌렸다.
+
+#### 문구 JS 통합
+
+`.only_desktop` / `.only_mobile` 이중 마크업을 제거. HTML에는 데스크톱 문구 한 벌만 두고
+`data-text_mobile` 속성에 모바일 문구를 담아 `initResponsiveText()`가 `matchMedia('(min-width: 768px)')`
+변화에 따라 `textContent`를 교체한다. 값이 빈 문자열이면 모바일에서 `hidden` 처리.
+JS가 실패해도 데스크톱 문구가 그대로 남아 degrade된다.
+
+#### 그 외
+
+- 아카이브 좌우 열 하단 라인 정렬: `.archive_grid { align-items: stretch }`,
+  `.archive_side_main { flex: 1 }`, `.archive_stage`는 데스크톱에서 `aspect-ratio: auto` +
+  `height: 100%`로 좌측 READ MORE 하단선까지 늘어난다 (1920 실측 delta **0px**, stage 847px).
+- 히어로 `aspect-ratio` `1920/1024` → **`4/3`** (1920에서 960px), `max-height: min(96vh, 1100px)`.
+  `<video>`는 `object-fit: cover` + `width/height: 100%` 유지.
+- Read More: 모바일 160x35 / 태블릿 190x48 / 데스크톱 210x54. flex 컬럼에서 늘어나지 않도록
+  `align-self: flex-start` + `width: fit-content`.
+- CTA 2개: `flex-wrap: nowrap` + `flex: 1 1 0` + `white-space: nowrap`으로 해상도가 낮아져도
+  나란히 유지되며 폭만 줄어든다.
+
 ## 검증 결과
 
 브라우저 실측 (2026-07-27).
