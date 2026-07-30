@@ -572,6 +572,36 @@ a {
   font-weight: 500;
 }
 
+/* 히어로 문구 진입 연출 - main.js가 클래스를 토글한다.
+   인트로가 떠 있는 동안 .is_pending으로 감춰 두었다가,
+   인트로가 완전히 걷힌 시점에 .is_entered로 아래에서 떠오른다.
+   클래스가 없으면(스크립트 미실행) 문구는 그냥 보인다. */
+.hero_content.is_pending .hero_caption,
+.hero_content.is_pending h1 {
+  opacity: 0;
+}
+
+.hero_content.is_entered .hero_caption {
+  animation: hero_rise 0.9s ease-out both;
+}
+
+/* 캡션이 먼저 뜨고 본문이 뒤따른다 */
+.hero_content.is_entered h1 {
+  animation: hero_rise 0.9s ease-out 0.2s both;
+}
+
+@keyframes hero_rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* 💻 데스크탑 전용 스타일 ( 화면 너비 1024px 이상 ) */
 @media (min-width: 1024px) {
   .hero_content h1 {
@@ -2118,6 +2148,15 @@ a {
 
   .intro_background img {
     transform: none;
+  }
+
+  /* 히어로 문구는 떠오르는 연출 없이 제자리에서 바로 보이게 한다 */
+  .hero_content.is_pending .hero_caption,
+  .hero_content.is_pending h1,
+  .hero_content.is_entered .hero_caption,
+  .hero_content.is_entered h1 {
+    animation: none;
+    opacity: 1;
   }
 }
 

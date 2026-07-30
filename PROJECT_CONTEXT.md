@@ -409,10 +409,11 @@ PRD §8 미구현 항목. `index.html`의 `.intro_screen` + `styles.css` 인트�
 - 전체화면 고정 오버레이(`z-index: 200`)로 헤더(100)와 커서 캔버스(90) 위를 덮는다.
   배경은 `21.brand1.jpg` + 딥그린 그라디언트(0.72 → 0.9), 그 위에 흰 로고 · 세리프 카피 ·
   우상단 `Skip` 버튼 · 하단 `Scroll` 힌트를 얹었다. 로고는 흰색 에셋이라 딥그린 위에서 그대로 쓴다.
-- **해제 조건 3가지** — 먼저 발생한 하나로 닫힌다.
-  1. `wheel` / `scroll` / `touchmove`, 그리고 아래 방향 키(Space, PageDown, ArrowDown, End, Enter, Escape)
+- **해제 조건 2가지** — 먼저 발생한 하나로 닫힌다. **자동 전환 타이머는 없다.**
+  1. `wheel` / `scroll` / `touchmove`, 그리고 스크롤 조작 키(Space, PageDown, ArrowDown, End)
   2. `Skip` 버튼 클릭
-  3. 노출 후 **3.5초** 타이머 (`AUTO_DISMISS_DELAY`)
+
+  사용자가 아무 입력도 하지 않으면 인트로는 계속 머문다(29초 유지 실측).
 - 해제되면 `.is_leaving`(opacity 0, 0.9s)으로 페이드 아웃하고, `transitionend`(opacity) 시점에
   `.is_removed`로 **`display: none`** 처리해 클릭을 가로채지 않게 한다.
   모션 최소화 등으로 `transitionend`가 오지 않는 경우를 위해 `FADE_DURATION + 150ms` 폴백 타이머를 둔다.
@@ -426,6 +427,25 @@ PRD §8 미구현 항목. `index.html`의 `.intro_screen` + `styles.css` 인트�
 `scrollbar-gutter: stable`로 잠금 중 스크롤바 폭(15px) 자리를 남기려 했으나,
 `overflow: hidden`인 스크롤 컨테이너에는 거터가 생기지 않아(실측 `clientWidth` 1188 = `innerWidth`) 제거했다.
 스크롤바가 사라지고 되돌아오는 순간은 모두 불투명한 오버레이가 가리는 구간이라 실제로 보이지 않는다.
+
+초기 구현에는 3.5초 자동 전환 타이머(`AUTO_DISMISS_DELAY`)가 있었으나 요구사항 변경으로 제거했다.
+
+### 히어로 진입 연출 (2026-07-30)
+
+`main.js`의 `initHeroEntrance()`. 인트로가 걷히는 흐름에 맞춰 히어로 영상과 문구의 시작 시점을 맞춘다.
+`initIntro(hero)`가 이 객체를 받아 두 시점에 각각 호출한다.
+
+| 시점 | 동작 |
+|---|---|
+| 인트로 노출 중 | 영상 `pause()` + `currentTime = 0`, `.hero_content`에 `.is_pending`(문구 `opacity: 0`) |
+| 페이드 아웃 **시작** | `startVideo()` — `currentTime = 0` 후 `play()`. 0.9초 페이드 동안 영상 앞부분이 서서히 드러난다 |
+| 페이드 아웃 **완료** | `revealText()` — `.is_entered`로 교체, 캡션 → 본문(0.2s 지연) 순서로 `hero_rise` (아래에서 fade-in + slide-up) |
+
+- 인트로 요소가 없거나 스크립트가 실행되지 않으면 클래스를 아예 붙이지 않는다.
+  이때는 영상 `autoplay`와 문구 기본 표시가 그대로 살아 있어 화면이 비지 않는다.
+- 메타데이터 로드 전 `currentTime` 대입은 거부될 수 있어 `try/catch`로 감싸고 재생 시점에 다시 되감는다.
+- 자동재생이 막힌 환경을 위해 `play()`의 Promise rejection을 삼킨다.
+- `prefers-reduced-motion: reduce`에서는 `hero_rise`를 끄고 문구를 바로 보이게 한다.
 
 ## 검증 결과
 
@@ -447,10 +467,13 @@ PRD §8 미구현 항목. `index.html`의 `.intro_screen` + `styles.css` 인트�
 
 | 항목 | 결과 |
 |---|---|
-| 인트로 - 타이머 | 입력 없이 자동 해제 → `is_leaving` → `is_removed`(`display: none`) |
+| 인트로 - 무입력 | 29초간 해제되지 않고 유지 (자동 전환 타이머 제거 확인) |
 | 인트로 - 휠 | 실제 휠 입력 시 해제. `is_leaving` → 약 2.0s 뒤 `is_removed` |
 | 인트로 - Skip 클릭 | 해제 + `aria-hidden="true"`, 포커스는 `body`로 복귀 |
 | 인트로 - 키보드 | `ArrowDown`으로 해제 (키보드 사용자 대비) |
+| 진입 연출 - 순서 | 페이드 시작 +9ms `video play @0.01` → 페이드 완료 시점에 `hero:is_entered` 동시 적용 |
+| 진입 연출 - 대기 상태 | 인트로 중 영상 `paused` / `currentTime` 0, 캡션 · 본문 `opacity` 0 |
+| 진입 연출 - 완료 상태 | 캡션 · 본문 `opacity` 1, 영상 재생 위치 0.3s대 (처음부터 재생됨) |
 | 스크롤 잠금 | 인트로 중 `html`/`body` `overflow: hidden`, 해제 후 클래스 제거 확인 |
 | 새로고침 | `scrollY` 0에서 시작 (스크롤 복원으로 인한 즉시 해제 없음) |
 | 해제 후 클릭 통과 | 화면 중앙 `hero_overlay`, 헤더 위치에서 GNB `현상하기` 히트 |
@@ -468,6 +491,9 @@ PRD §8 미구현 항목. `index.html`의 `.intro_screen` + `styles.css` 인트�
 
 - `prefers-reduced-motion: reduce` 경로는 실측하지 못했다(브라우저 에뮬레이션 불가).
   전환을 0.2s로 남겨 `transitionend`가 오게 했고, 오지 않아도 폴백 타이머가 `display: none`을 보장한다.
+- **영상 연속 재생은 실측 환경에서 확인 불가.** 프리뷰 브라우저가 화면 갱신이 없는 동안 영상을 스스로
+  `pause`시킨다(코드와 무관 - 콘솔에서 `play()`를 직접 호출해도 0.7초 뒤 `pause` 이벤트 발생).
+  `play()`는 오류 없이 resolve되고 재생 위치도 0부터 전진하므로, 실제 브라우저에서 육안 확인 권장.
 
 ### 디자인 불일치
 

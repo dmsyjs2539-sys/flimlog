@@ -5,14 +5,73 @@
   'use strict';
 
   /* -------------------------------------------------------
+     히어로 진입 연출
+     인트로가 있는 동안에는 영상을 멈추고 문구를 감춰 두었다가,
+     인트로가 걷히는 흐름에 맞춰 영상을 처음부터 재생하고 문구를 띄운다.
+     인트로가 없으면(스크립트만 빠져도 마찬가지) 아무것도 붙이지 않아
+     영상은 autoplay, 문구는 그대로 보이는 기본 동작이 유지된다.
+     ------------------------------------------------------- */
+  function initHeroEntrance() {
+    var content = document.querySelector('.hero_content');
+    var video = document.querySelector('.hero_image');
+    var hasIntro = !!document.getElementById('intro_screen');
+
+    function rewind() {
+      /* 메타데이터 로드 전에는 currentTime 대입이 거부될 수 있다 */
+      try {
+        video.currentTime = 0;
+      } catch (error) {
+        /* 무시하고 재생 시점에 다시 시도한다 */
+      }
+    }
+
+    if (hasIntro && content) {
+      content.classList.add('is_pending');
+    }
+
+    if (hasIntro && video) {
+      /* autoplay로 이미 흐르고 있을 수 있으므로 멈추고 첫 프레임으로 되감는다 */
+      video.pause();
+      rewind();
+    }
+
+    return {
+      /* 인트로 페이드 아웃 시작 - 걷히는 0.9초 동안 영상 앞부분이 서서히 드러난다 */
+      startVideo: function () {
+        if (!video) {
+          return;
+        }
+
+        rewind();
+
+        var played = video.play();
+
+        /* 자동재생이 막힌 환경에서 unhandled rejection이 남지 않게 한다 */
+        if (played && typeof played.catch === 'function') {
+          played.catch(function () {});
+        }
+      },
+
+      /* 인트로가 완전히 걷힌 시점 - 문구가 아래에서 떠오른다 */
+      revealText: function () {
+        if (!content) {
+          return;
+        }
+
+        content.classList.remove('is_pending');
+        content.classList.add('is_entered');
+      }
+    };
+  }
+
+  /* -------------------------------------------------------
      인트로 / 스플래시 (PRD §8)
-     아래 셋 중 먼저 발생한 조건으로 인트로를 걷어낸다.
+     아래 둘 중 먼저 발생한 조건으로 인트로를 걷어낸다. (자동 전환 타이머 없음)
        1) 휠 / 스크롤 / 터치 이동 / 아래 방향 키
        2) Skip 버튼 클릭
-       3) 노출 후 3.5초 (타이머)
      페이드 아웃이 끝나면 display: none 처리해 클릭을 가로채지 않게 한다.
      ------------------------------------------------------- */
-  function initIntro() {
+  function initIntro(hero) {
     var intro = document.getElementById('intro_screen');
 
     if (!intro) {
@@ -20,12 +79,11 @@
     }
 
     var skipButton = document.getElementById('intro_skip');
-    var AUTO_DISMISS_DELAY = 3500;
     /* styles.css의 .intro_screen transition(0.9s)과 맞춘 폴백 기준값 */
     var FADE_DURATION = 900;
-    var SCROLL_KEYS = [' ', 'Spacebar', 'PageDown', 'ArrowDown', 'End', 'Enter', 'Escape'];
+    /* 휠이 없는 키보드 사용자를 위한 스크롤 조작 키 (Skip은 포커스 후 Enter/Space로 눌린다) */
+    var SCROLL_KEYS = [' ', 'Spacebar', 'PageDown', 'ArrowDown', 'End'];
     var isDismissed = false;
-    var autoTimer = null;
 
     /* 새로고침 시 브라우저가 스크롤 위치를 복원하면 scroll 이벤트가 즉시 발생해
        인트로가 보이자마자 닫힌다. 복원을 끄고 맨 위에서 시작한다. */
@@ -54,10 +112,12 @@
       document.removeEventListener('keydown', onKeydown);
     }
 
-    /* 전환이 끝난 뒤에만 흐름에서 완전히 제거한다 */
+    /* 전환이 끝난 뒤에만 흐름에서 완전히 제거한다.
+       여기가 메인 페이지에 실제로 들어선 시점이라 히어로 문구도 이때 띄운다. */
     function remove() {
       intro.classList.add('is_removed');
       intro.setAttribute('aria-hidden', 'true');
+      hero.revealText();
     }
 
     function dismiss() {
@@ -66,12 +126,12 @@
       }
 
       isDismissed = true;
-      window.clearTimeout(autoTimer);
       unbind();
 
       document.documentElement.classList.remove('intro_is_active');
       document.body.classList.remove('intro_is_active');
       intro.classList.add('is_leaving');
+      hero.startVideo();
 
       /* 숨겨질 요소 안에 포커스가 남지 않게 한다 */
       if (skipButton && document.activeElement === skipButton) {
@@ -100,8 +160,6 @@
     if (skipButton) {
       skipButton.addEventListener('click', dismiss);
     }
-
-    autoTimer = window.setTimeout(dismiss, AUTO_DISMISS_DELAY);
   }
 
   /* -------------------------------------------------------
@@ -819,7 +877,7 @@
     resize();
   }
 
-  initIntro();
+  initIntro(initHeroEntrance());
   initHeader();
   initMobileHeader();
   initResponsiveText();
