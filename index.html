@@ -69,7 +69,7 @@
       <section class="hero_section">
         <div class="hero_visual">
           <video class="hero_image" autoplay loop muted playsinline aria-label="필름감성영상">
-            <source src="assets/image/hero_video.mp4" type="video/mp4" />
+            <source src="assets/image/video.mp4" type="video/mp4" />
             브라우저가 비디오 태그를 지원하지 않습니다.
           </video>
           <div class="hero_overlay"></div>
@@ -119,17 +119,42 @@
 
           <aside class="map_card" aria-label="가까운 필름로그 지점">
             <div class="map_content">
+              <!-- TODO: PRD §7 - Kakao/Naver 지도 API 연동 시 배경 이미지를 대화형 지도 캔버스로 교체.
+                   마커/패널은 아래 HTML 요소를 그대로 재사용한다. -->
               <div class="map_image_wrapper">
-                <!-- TODO: PRD §7 - Kakao/Naver 지도 API 연동 시 이 목업 이미지를 대화형 지도 캔버스로 교체 -->
-                <img src="assets/image/2.map.png" alt="필름로그 지점 위치를 표시한 서울 지도" />
-              </div>
-              <div class="location_panel">
-                <h2>필름로그 서울 본점</h2>
-                <ul>
-                  <li>위치: 서울 중구 퇴계로 53길 6-17</li>
-                  <li>영업시간: 매일 13:00 - 17:00 / 자판기 24시</li>
-                </ul>
-                <a class="link_button" href="#">실시간 재고 확인하기</a>
+                <img class="map_background" src="assets/image/map.png" alt="" />
+
+                <!-- 지점 개수 뱃지 (지도 위 오버레이, 클릭 가능) -->
+                <button type="button" class="map_badge map_badge_cluster" aria-label="종로 권역 지점 2곳 보기">2</button>
+                <button type="button" class="map_badge map_badge_point" aria-label="필름로그 서울 본점 보기">1</button>
+                <button type="button" class="map_badge map_badge_east" aria-label="성동 권역 지점 1곳 보기">1</button>
+                <button type="button" class="map_badge map_badge_south" aria-label="용산 권역 지점 1곳 보기">1</button>
+
+                <!-- 지점 안내 패널 -->
+                <div class="location_panel">
+                  <h3>필름로그 서울 본점</h3>
+                  <ul>
+                    <li>위치: 서울 중구 퇴계로 53길 6-17</li>
+                    <li>영업시간: 매일 13:00 - 17:00 / 자판기 24시</li>
+                  </ul>
+                  <!-- TODO: 클릭 시 재고 상세 패널이 펼쳐지도록 확장 예정 -->
+                  <button type="button" class="stock_toggle" aria-expanded="false">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                      <path d="M6 9L12 15L18 9" />
+                    </svg>
+                    실시간 재고 확인하기
+                  </button>
+                </div>
+
+                <!-- 우측 하단 현재 위치 아이콘 -->
+                <button type="button" class="map_locate" aria-label="현재 위치로 이동">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <circle cx="12" cy="12" r="3.2" />
+                    <path d="M12 2V5M12 19V22M2 12H5M19 12H22" />
+                  </svg>
+                </button>
               </div>
             </div>
           </aside>

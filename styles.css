@@ -35,6 +35,12 @@
   --header_gutter: 16px;
   --header_height: 64px;
 
+  /* 본문 타이포 스케일 - 브레이크포인트마다 한 단계씩 키운다 */
+  --font_xsmall: 13px;
+  --font_small: 15px;
+  --font_body: 16px;
+  --font_lead: 18px;
+
   color: var(--color_text);
   background-color: var(--color_bg);
 }
@@ -215,7 +221,7 @@ a {
 .global_nav a {
   position: relative;
   color: var(--color_text_invert);
-  font-size: 14px;
+  font-size: var(--font_small);
   padding-bottom: 4px;
   white-space: nowrap;
   transition: color 0.25s ease;
@@ -253,7 +259,7 @@ a {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
   border-radius: 8px;
   color: var(--color_text_muted);
-  font-size: 14px;
+  font-size: var(--font_small);
 }
 
 .search_box.is_open {
@@ -345,6 +351,17 @@ a {
   font-weight: 500;
 }
 
+/* 💻 데스크탑 전용 스타일 ( 화면 너비 1024px 이상 ) */
+@media (min-width: 1024px) {
+  .hero_content h1 {
+    /* 글자가 아래로 내려가지 않고 강제로 한 줄 유지 */
+    white-space: nowrap;
+
+    /* 한 줄로 길어진 글자가 영역 밖으로 삐져나가지 않도록 폰트 크기 미세 조정 */
+    font-size: clamp(15px, 1.3vw, 20px);
+  }
+}
+
 /* 모바일 순서: 타이틀/설명(1) -> 지도 카드(2) -> CTA(3) */
 .locator_actions {
   order: 3;
@@ -363,7 +380,7 @@ a {
 
 .locator_body {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--font_body);
   line-height: 1.8;
   color: rgba(25, 25, 25, 0.64);
 }
@@ -480,6 +497,8 @@ a {
 }
 
 /* 시안 규격 751 x 797 - 좁은 화면에서는 비율만 유지하며 축소된다 */
+/* 시안 규격 751 x 797 - 좁은 화면에서는 비율만 유지하며 축소된다.
+   container-type을 지정해야 마커가 cqw로 지도 폭에 비례해 줄어든다. */
 .map_image_wrapper {
   position: relative;
   overflow: hidden;
@@ -487,47 +506,157 @@ a {
   width: 100%;
   max-width: 751px;
   aspect-ratio: 751 / 797;
+  container-type: inline-size;
 }
 
-.map_image_wrapper img {
+/* 배경 지도. 정보는 아래 HTML 요소가 담당하므로 이미지는 장식 처리(alt="") */
+.map_background {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.location_panel {
-  background: var(--color_surface);
-  margin-top: 12px;
-  padding: 16px;
-  border-radius: 6px;
-  box-shadow: 0 4px 5.1px rgba(0, 0, 0, 0.12);
+/* ---- 지도 위 오버레이 ---- */
+
+/* 크기·좌표는 2.map.png(1502x1594) 원본 실측값을 비율로 옮긴 것.
+   cqw = 지도 래퍼 가로폭의 1% 이므로 지도가 줄어도 마커 비율이 유지된다. */
+.map_badge {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
+  border-radius: 100%;
+  background: #4a4a4a;
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.location_panel h2 {
+.map_badge:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 원본 지름 80px / 중심 (31.3%, 20.0%) */
+.map_badge_cluster {
+  width: 34px;
+  width: max(30px, 5.33cqw);
+  left: 28.6%;
+  top: 17.5%;
+  font-size: 15px;
+  font-size: max(15px, 2.8cqw);
+}
+
+/* 원본 지름 54px / 중심 (37.9%, 21.2%) */
+.map_badge_point {
+  width: 24px;
+  width: max(22px, 3.6cqw);
+  left: 36.1%;
+  top: 19.5%;
+  background: var(--color_accent);
+  color: var(--color_accent_text);
+  font-size: 11px;
+  font-size: max(11px, 2cqw);
+}
+
+/* 원본 지름 52px / 중심 (46.2%, 19.2%) */
+.map_badge_east {
+  width: 23px;
+  width: max(21px, 3.46cqw);
+  left: 44.5%;
+  top: 17.6%;
+  font-size: 11px;
+  font-size: max(11px, 2cqw);
+}
+
+/* 원본 지름 52px / 중심 (37.5%, 25.7%) */
+.map_badge_south {
+  width: 23px;
+  width: max(21px, 3.46cqw);
+  left: 35.8%;
+  top: 24.1%;
+  font-size: 11px;
+  font-size: max(11px, 2cqw);
+}
+
+.location_panel {
+  position: absolute;
+  left: 8%;
+  top: 36.7%;
+  width: min(58%, 320px);
+  padding: 14px 16px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+}
+
+.location_panel h3 {
   margin: 0 0 10px;
-  font-size: 17px;
+  font-size: var(--font_small);
+  font-weight: 700;
   color: #000000;
 }
 
 .location_panel ul {
-  margin: 0;
-  padding-left: 16px;
+  margin: 0 0 10px;
+  padding-left: 14px;
   color: #6b6b6b;
-  font-size: 13px;
+  font-size: var(--font_xsmall);
   line-height: 1.6;
 }
 
-.location_panel ul li {
-  margin-bottom: 6px;
+.location_panel li {
+  margin-bottom: 4px;
 }
 
-.link_button {
+.stock_toggle {
   display: inline-flex;
   align-items: center;
-  margin-top: 10px;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
   color: #303030;
-  font-size: 13px;
-  border-bottom: 1px solid currentColor;
+  font-size: var(--font_xsmall);
+  cursor: pointer;
+}
+
+.stock_toggle svg {
+  transition: transform 0.25s ease;
+}
+
+.stock_toggle[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.map_locate {
+  position: absolute;
+  right: 4%;
+  bottom: 4%;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #4a4a4a;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.map_locate:hover {
+  background: #ffffff;
 }
 
 /* ---------------------------------------------------------
@@ -561,7 +690,7 @@ a {
 
 .feature_intro_sub {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--font_small);
   line-height: 1.8;
   color: var(--color_text_muted);
 }
@@ -573,7 +702,7 @@ a {
 
 .feature_text_en {
   margin-top: 12px;
-  font-size: 13px;
+  font-size: var(--font_xsmall);
   color: var(--color_text_muted);
 }
 
@@ -593,7 +722,7 @@ a {
 .feature_text p {
   margin: 0;
   color: rgba(25, 25, 25, 0.64);
-  font-size: 16px;
+  font-size: var(--font_body);
   line-height: 1.7;
   letter-spacing: 0.48px;
 }
@@ -662,10 +791,22 @@ a {
   transform: scale(1.03);
 }
 
+/* 제목/본문 줄 수가 달라도 READ MORE가 항상 카드 맨 아래에 오도록
+   본문 영역이 남는 높이를 흡수하고 버튼은 margin-top: auto로 밀린다 */
 .feature_card_body {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.feature_card p {
+  /* 3줄 분량을 기본 확보해 카드마다 본문 시작선이 크게 어긋나지 않게 한다 */
+  min-height: calc(1.6em * 3);
+}
+
+.feature_card_body .read_more {
+  margin-top: auto;
 }
 
 .feature_index {
@@ -676,7 +817,7 @@ a {
 
 .feature_card h3 {
   margin: 0;
-  font-size: 20px;
+  font-size: calc(var(--font_body) + 3px);
   color: var(--color_brand);
   letter-spacing: 0.72px;
 }
@@ -684,7 +825,7 @@ a {
 .feature_card p {
   margin: 0;
   color: var(--color_text);
-  font-size: 14px;
+  font-size: var(--font_small);
   line-height: 1.6;
 }
 
@@ -772,7 +913,7 @@ a {
   margin: 0;
   padding-left: 18px;
   color: var(--color_text);
-  font-size: 15px;
+  font-size: var(--font_small);
   line-height: 1.7;
 }
 
@@ -946,7 +1087,7 @@ a {
 
 .gallery_description {
   margin: 0 0 28px;
-  font-size: 16px;
+  font-size: var(--font_body);
   line-height: 1.7;
   color: var(--color_text_muted);
 }
@@ -972,7 +1113,7 @@ a {
 }
 
 .archive_meta_row dt {
-  font-size: 13px;
+  font-size: var(--font_xsmall);
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--color_text_muted);
@@ -980,7 +1121,7 @@ a {
 
 .archive_meta_row dd {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--font_body);
   font-weight: 500;
   color: var(--color_text);
 }
@@ -990,7 +1131,7 @@ a {
   align-items: center;
   gap: 3px;
   color: #333333;
-  font-size: 15px;
+  font-size: var(--font_small);
   letter-spacing: 3px;
   text-transform: uppercase;
 }
@@ -1070,7 +1211,7 @@ a {
   flex: 1;
   min-width: 0;
   margin: 0;
-  font-size: 17px;
+  font-size: var(--font_body);
   font-weight: 500;
 }
 
@@ -1136,7 +1277,7 @@ a {
 
 .carousel_status {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--font_small);
   letter-spacing: 2px;
   color: var(--color_text_muted);
 }
@@ -1213,7 +1354,7 @@ a {
 
 .approach_heading p {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--font_body);
   line-height: 1.8;
   color: rgba(255, 255, 255, 0.92);
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
@@ -1265,7 +1406,7 @@ a {
 
 .approach_detail p {
   margin: 0 0 16px;
-  font-size: 16px;
+  font-size: var(--font_body);
   line-height: 1.7;
 }
 
@@ -1313,7 +1454,7 @@ a {
 
 .footer_brand p {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--font_small);
   line-height: 1.6;
   color: var(--color_text_muted);
 }
@@ -1332,7 +1473,7 @@ a {
 
 .footer_info p {
   margin: 0 0 12px;
-  font-size: 15px;
+  font-size: var(--font_small);
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
@@ -1360,6 +1501,11 @@ a {
     --gutter: 32px;
     --header_gutter: 32px;
     --header_height: 88px;
+
+    --font_xsmall: 14px;
+    --font_small: 16px;
+    --font_body: 17px;
+    --font_lead: 20px;
   }
 
   .site_header {
@@ -1392,12 +1538,17 @@ a {
     height: 44px;
   }
 
+  /* 항목은 콘텐츠 폭만 차지하고, 남는 공간은 좌우 auto 마진으로 나눠 중앙에 모인다 */
   .global_nav {
     position: static;
     display: flex;
+    flex: 0 1 auto;
+    margin: 0 auto;
+    min-width: 0;
     flex-direction: row;
     flex-wrap: nowrap;
-    gap: 16px;
+    justify-content: center;
+    gap: 26px;
     padding: 0;
     background: none;
     backdrop-filter: none;
@@ -1406,8 +1557,8 @@ a {
   }
 
   .global_nav a {
-    font-size: 14px;
-    padding-bottom: 4px;
+    font-size: var(--font_small);
+    padding: 0 4px 4px;
     white-space: nowrap;
   }
 
@@ -1420,7 +1571,7 @@ a {
     display: flex;
     width: 150px;
     padding: 9px 12px;
-    font-size: 13px;
+    font-size: var(--font_xsmall);
     border-color: rgba(255, 255, 255, 0.5);
     background: rgba(255, 255, 255, 0.6);
     box-shadow: 0 1px 5.3px rgba(25, 33, 61, 0.03);
@@ -1461,7 +1612,7 @@ a {
   }
 
   .locator_section {
-    padding: 96px var(--gutter) 112px;
+    padding: 80px var(--gutter) 96px;
   }
 
   .locator_intro {
@@ -1532,15 +1683,18 @@ a {
   }
 
   .feature_section {
-    padding: 96px var(--gutter) 112px;
+    padding-top: 80px;
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+    padding-bottom: 500px;
   }
 
   .gallery_section {
-    padding: 96px var(--gutter) 112px;
+    padding: 80px var(--gutter) 96px;
   }
 
   .archive_section {
-    padding: 96px var(--gutter) 112px;
+    padding: 80px var(--gutter) 96px;
   }
 
   /* 태블릿부터 무한 자동 가로 스크롤(마퀴).
@@ -1632,11 +1786,18 @@ a {
 
 @media (min-width: 1280px) {
   :root {
-    /* 1280 -> 80px, 1920 -> 120px */
-    --gutter: clamp(80px, 6.25vw, 120px);
+    /* 시안 실측 좌우 마진 96~105px 기준. 1280 -> 67px, 1920 -> 100px.
+       page_max도 함께 넓혀야 컨테이너 상한에 걸려 마진이 되돌아가지 않는다. */
+    --gutter: clamp(67px, 5.2vw, 100px);
+    --page_max: 1720px;
     /* 1280 -> 86px, 1920 -> 130px */
     --header_gutter: clamp(86px, 6.77vw, 130px);
     --header_height: 92px;
+
+    --font_xsmall: 15px;
+    --font_small: 17px;
+    --font_body: 18px;
+    --font_lead: 22px;
   }
 
   .site_header {
@@ -1653,17 +1814,17 @@ a {
   }
 
   .global_nav {
-    gap: 30px;
+    gap: 34px;
   }
 
   .global_nav a {
-    font-size: 16px;
+    font-size: var(--font_small);
   }
 
   .search_box {
     width: 220px;
     padding: 11px 18px;
-    font-size: 15px;
+    font-size: var(--font_small);
   }
 
   /* 히어로 카피는 배너 좌측/하단에서 각각 100px */
@@ -1676,7 +1837,7 @@ a {
   }
 
   .locator_section {
-    padding: 140px var(--gutter) 160px;
+    padding: 118px var(--gutter) 136px;
   }
 
   /* 인트로 영역 660px 확보 후 subtitle로 이어짐 */
@@ -1706,15 +1867,15 @@ a {
   }
 
   .feature_section {
-    padding: 140px var(--gutter) 160px;
+    padding: 118px var(--gutter) 136px;
   }
 
   .gallery_section {
-    padding: 140px var(--gutter) 160px;
+    padding: 118px var(--gutter) 136px;
   }
 
   .archive_section {
-    padding: 140px var(--gutter) 160px;
+    padding: 118px var(--gutter) 136px;
   }
 
   /* 데스크톱 시안은 4장이 보이고 나머지는 흐르며 이어진다 */
@@ -1740,10 +1901,10 @@ a {
     margin-bottom: 250px;
   }
 
-  /* 우측 이미지 영역 확대 */
+  /* 우측 이미지 폭을 위 아카이브 섹션(일상의 온도) 이미지와 동일하게 맞춘다 */
   .gallery_layout {
-    grid-template-columns: minmax(0, 1fr) minmax(0, min(760px, 55%));
-    gap: 80px;
+    grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
+    gap: 60px;
   }
 
   .approach_section {
