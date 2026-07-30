@@ -348,6 +348,41 @@ JS가 실패해도 데스크톱 문구가 그대로 남아 degrade된다.
 그럼에도 체감 지적이 있어 데스크톱 섹션 패딩을 140/160 → **118/136**,
 태블릿을 96/112 → **80/96**으로 약 15% 줄였다. 더 줄이면 시안과의 괴리가 커진다.
 
+### 섹션 여백 공통화 및 증대 (2026-07-30)
+
+메인 섹션 4개에 `.section_block` 공통 클래스를 붙이고, 컨테이너 폭·좌우 여백·세로 여백을
+한곳에서 관리하도록 정리했다. 이전에는 같은 `padding` 선언이 4개 섹션 x 3 브레이크포인트로
+12곳에 흩어져 있었다.
+
+```css
+.section_block {
+  max-width: var(--container_max);
+  margin: 0 auto;
+  padding: var(--section_pad_top) var(--gutter) var(--section_pad_bottom);
+}
+/* 지도 -> 카드 -> 아카이브 구간은 단락 구분을 위해 아래 여백을 더 준다 */
+.locator_section,
+.feature_section {
+  padding-bottom: calc(var(--section_pad_bottom) + var(--section_gap_extra));
+}
+```
+
+| 토큰 | 360 | 768 | 1280+ |
+|---|---|---|---|
+| `--section_pad_top` | 112px | 120px | 160px |
+| `--section_pad_bottom` | 128px | 136px | 180px |
+| `--section_gap_extra` | 24px | 32px | 40px |
+
+1920 기준 섹션 사이 실제 간격(앞 섹션 padding-bottom + 뒤 섹션 padding-top):
+locator→feature **380px**, feature→archive **380px**, archive→gallery **340px**,
+gallery→approach **360px**. 시안 실측 간격(400~580px)에 근접했다.
+전체 높이 8,889 → **9,313px** (시안 10,207px).
+
+모든 브레이크포인트에서 섹션 여백 최소값은 88px로 요구 하한(80px) 이상.
+
+작업 중 `.feature_section`에 붙어 있던 `padding-bottom: 500px`를 제거했다.
+토큰 체계로 대체되며 불필요해졌고, 마퀴 레일 높이(577px)와 충돌하지 않음을 확인했다.
+
 ## 검증 결과
 
 브라우저 실측 (2026-07-27).

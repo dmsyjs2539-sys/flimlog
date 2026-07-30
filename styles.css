@@ -41,6 +41,13 @@
   --font_body: 16px;
   --font_lead: 18px;
 
+  /* 섹션 세로 여백 - 모든 메인 섹션이 .section_block으로 공유한다.
+     어느 브레이크포인트에서도 80px 아래로 내려가지 않는다. */
+  --section_pad_top: 112px;
+  --section_pad_bottom: 128px;
+  /* 지도 - 카드 - 고양이 섹션처럼 단락을 확실히 끊어야 하는 구간의 추가 여백 */
+  --section_gap_extra: 24px;
+
   color: var(--color_text);
   background-color: var(--color_bg);
 }
@@ -85,6 +92,23 @@ a {
 
 .page_shell {
   min-height: 100vh;
+}
+
+/* ---------------------------------------------------------
+   공통 섹션 블록 - 컨테이너 폭 + 좌우 여백 + 세로 여백을 한곳에서 관리
+   --------------------------------------------------------- */
+
+.section_block {
+  max-width: var(--container_max);
+  margin: 0 auto;
+  padding: var(--section_pad_top) var(--gutter) var(--section_pad_bottom);
+}
+
+/* 지도 섹션 -> 카드 섹션 -> 고양이(아카이브) 섹션이 이어지는 구간은
+   아래 여백을 더 줘서 단락이 뭉쳐 보이지 않게 한다 */
+.locator_section,
+.feature_section {
+  padding-bottom: calc(var(--section_pad_bottom) + var(--section_gap_extra));
 }
 
 /* 문구는 HTML에 한 벌만 두고 main.js가 matchMedia로 교체한다.
@@ -427,12 +451,6 @@ a {
    히어로 하단 지도 섹션 - 좌측 텍스트 + CTA, 우측 지도 카드
    --------------------------------------------------------- */
 
-.locator_section {
-  max-width: var(--container_max);
-  margin: 0 auto;
-  padding: 96px var(--gutter) 120px;
-}
-
 /* 중앙 인트로 - 데스크톱에서 660px 높이를 확보해 여백을 두고 subtitle로 이어진다 */
 .locator_intro {
   max-width: var(--text_max);
@@ -669,12 +687,6 @@ a {
   color: var(--color_brand);
 }
 
-.feature_section {
-  max-width: var(--container_max);
-  margin: 0 auto;
-  padding: 96px var(--gutter) 120px;
-}
-
 /* 타이틀 영역과 아래 설명/카드 사이 간격 (데스크톱 250px) */
 .feature_intro {
   max-width: var(--text_max);
@@ -856,12 +868,6 @@ a {
 /* ---------------------------------------------------------
    archive
    --------------------------------------------------------- */
-
-.archive_section {
-  max-width: var(--container_max);
-  margin: 0 auto;
-  padding: 96px var(--gutter) 120px;
-}
 
 .archive_description {
   margin-bottom: 24px;
@@ -1063,12 +1069,6 @@ a {
 /* ---------------------------------------------------------
    gallery
    --------------------------------------------------------- */
-
-.gallery_section {
-  max-width: var(--container_max);
-  margin: 0 auto;
-  padding: 96px var(--gutter) 120px;
-}
 
 .gallery_layout {
   display: grid;
@@ -1506,6 +1506,10 @@ a {
     --font_small: 16px;
     --font_body: 17px;
     --font_lead: 20px;
+
+    --section_pad_top: 120px;
+    --section_pad_bottom: 136px;
+    --section_gap_extra: 32px;
   }
 
   .site_header {
@@ -1611,10 +1615,6 @@ a {
     font-size: clamp(16px, 2vw, 22px);
   }
 
-  .locator_section {
-    padding: 80px var(--gutter) 96px;
-  }
-
   .locator_intro {
     min-height: 380px;
     margin-bottom: 80px;
@@ -1680,21 +1680,6 @@ a {
   .gallery_layout {
     grid-template-columns: minmax(0, 1fr) minmax(0, 52%);
     gap: 48px;
-  }
-
-  .feature_section {
-    padding-top: 80px;
-    padding-left: var(--gutter);
-    padding-right: var(--gutter);
-    padding-bottom: 500px;
-  }
-
-  .gallery_section {
-    padding: 80px var(--gutter) 96px;
-  }
-
-  .archive_section {
-    padding: 80px var(--gutter) 96px;
   }
 
   /* 태블릿부터 무한 자동 가로 스크롤(마퀴).
@@ -1798,6 +1783,10 @@ a {
     --font_small: 17px;
     --font_body: 18px;
     --font_lead: 22px;
+
+    --section_pad_top: 160px;
+    --section_pad_bottom: 180px;
+    --section_gap_extra: 40px;
   }
 
   .site_header {
@@ -1836,10 +1825,6 @@ a {
     width: min(760px, calc(100% - 200px));
   }
 
-  .locator_section {
-    padding: 118px var(--gutter) 136px;
-  }
-
   /* 인트로 영역 660px 확보 후 subtitle로 이어짐 */
   .locator_intro {
     min-height: 660px;
@@ -1864,18 +1849,6 @@ a {
     min-height: 54px;
     padding: 12px 32px;
     font-size: 16px;
-  }
-
-  .feature_section {
-    padding: 118px var(--gutter) 136px;
-  }
-
-  .gallery_section {
-    padding: 118px var(--gutter) 136px;
-  }
-
-  .archive_section {
-    padding: 118px var(--gutter) 136px;
   }
 
   /* 데스크톱 시안은 4장이 보이고 나머지는 흐르며 이어진다 */
@@ -1935,14 +1908,6 @@ a {
    ========================================================= */
 
 @media (max-width: 767px) {
-
-  .locator_section,
-  .feature_section,
-  .archive_section,
-  .gallery_section {
-    padding-top: 120px;
-    padding-bottom: 140px;
-  }
 
   /* 지정 높이(787px)에 최대한 근접하도록 상하 여백을 줄인다 */
   .approach_section {
