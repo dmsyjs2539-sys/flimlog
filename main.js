@@ -578,13 +578,15 @@
 
     var context = canvas.getContext('2d');
     var particles = [];
-    var MAX_PARTICLES = 140;
-    /* 크림 배경과 어울리는 앰버 - 테라코타 - 딥그린 계열 */
+    var MAX_PARTICLES = 160;
+    /* 밝은 크림 배경과 어두운 히어로 영상 어느 쪽에서도 읽히도록
+       채도 있는 앰버·테라코타를 주로 쓰고 밝은/어두운 색을 하나씩 섞는다.
+       [r, g, b, alpha] */
     var TINTS = [
-      [255, 185, 0],
-      [239, 174, 144],
-      [246, 245, 242],
-      [13, 51, 34]
+      [255, 185, 0, 0.72],
+      [239, 174, 144, 0.66],
+      [246, 245, 242, 0.6],
+      [13, 51, 34, 0.34]
     ];
 
     var ratio = 1;
@@ -611,16 +613,16 @@
         var tint = TINTS[Math.floor(Math.random() * TINTS.length)];
 
         particles.push({
-          x: x + (Math.random() - 0.5) * 14,
-          y: y + (Math.random() - 0.5) * 14,
+          x: x + (Math.random() - 0.5) * 16,
+          y: y + (Math.random() - 0.5) * 16,
           vx: (Math.random() - 0.5) * 0.5,
           /* 물방울처럼 아주 천천히 아래로 흘러내린다 */
           vy: 0.16 + Math.random() * 0.34,
-          radius: 2.4 + Math.random() * 5.2,
+          radius: 3.4 + Math.random() * 6.2,
           life: 1,
-          decay: 0.012 + Math.random() * 0.016,
+          decay: 0.009 + Math.random() * 0.013,
           tint: tint,
-          alpha: tint === TINTS[3] ? 0.22 : 0.5
+          alpha: tint[3]
         });
       }
     }
@@ -648,8 +650,10 @@
         var gradient = context.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius);
         var rgb = p.tint[0] + ',' + p.tint[1] + ',' + p.tint[2];
 
+        /* 가운데를 조금 더 진하게 둬서 물방울 알갱이처럼 보이게 한다 */
         gradient.addColorStop(0, 'rgba(' + rgb + ',' + eased * p.alpha + ')');
-        gradient.addColorStop(0.55, 'rgba(' + rgb + ',' + eased * p.alpha * 0.42 + ')');
+        gradient.addColorStop(0.35, 'rgba(' + rgb + ',' + eased * p.alpha * 0.78 + ')');
+        gradient.addColorStop(0.7, 'rgba(' + rgb + ',' + eased * p.alpha * 0.32 + ')');
         gradient.addColorStop(1, 'rgba(' + rgb + ',0)');
 
         context.fillStyle = gradient;
