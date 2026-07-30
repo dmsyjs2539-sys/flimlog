@@ -1,6 +1,25 @@
 # [필름로그] 프로젝트 진행 상황
 
-최종 갱신: 2026-07-27
+최종 갱신: 2026-07-30
+
+## 폴더 구조 (2026-07-30 정리)
+
+빌드 도구 없이 정적 파일만 쓰는 구조라, 진입점을 루트에 두고 소스 종류별로만 나눴다.
+
+```
+Flimlog_web/
+├─ index.html          진입점 (루트 유지 - 서버 기본 문서)
+├─ css/styles.css
+├─ js/main.js
+├─ assets/image/       사진 · 영상 · 로고
+├─ assets/figma/       시안에서 내려받은 아이콘 · 썸네일
+└─ *.md                PRD · 컨텍스트 · 디자인 분석 (CLAUDE.md가 참조하므로 루트 유지)
+```
+
+- `index.html`의 연결 경로는 `css/styles.css` · `js/main.js`로 갱신했다.
+- `assets/` 경로는 `index.html`이 루트에 그대로 있어 수정할 필요가 없었다.
+  `styles.css`에는 `url()` 참조가 하나도 없어 상대 경로 문제도 발생하지 않았다.
+- 아래 문서에서 `main.js` · `styles.css`로만 적힌 곳은 각각 `js/main.js` · `css/styles.css`를 가리킨다.
 
 ## 완료 내용
 
@@ -480,6 +499,11 @@ PRD §8 미구현 항목. `index.html`의 `.intro_screen` + `styles.css` 인트�
 | 헤더 전환 | threshold 398px 기준 - 0px `false` / 1000px · 2500px `true` |
 | 콘솔 오류 | 없음 |
 | 가로 스크롤 | 없음 |
+
+폴더 구조 정리 후 재검증 (2026-07-30): `index.html`의 로컬 경로 28개 전부 존재 확인,
+네트워크 요청 전부 200(404 0건), 깨진 이미지 0건, CSS·JS 정상 적용(`z-index: 200` 계산 확인,
+`.cursor_trail`/`.feature_marquee` 생성), Skip → 히어로 진입 → 스크롤까지 동작 유지.
+`http://`와 `file://` 양쪽에서 `css/`·`js/` 경로가 모두 200으로 응답했다.
 
 인트로 렌더링은 데스크톱(1188px)과 모바일(375x812) 모두 스크린샷으로 확인했다.
 초기에 한글 문구가 단어 중간에서 끊기고(`순간까 / 지`) `Scroll` 힌트와 겹쳐,
