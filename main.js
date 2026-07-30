@@ -558,6 +558,163 @@
     startRotation();
   }
 
+  /* -------------------------------------------------------
+     커서 잔상: 마우스가 지나간 자리에 필름 감성의 물방울 입자가 남았다 사라진다.
+     - 터치 기기와 prefers-reduced-motion 환경에서는 아예 만들지 않는다
+     - 입자가 모두 사라지면 rAF를 멈춰 유휴 상태에서 CPU를 쓰지 않는다
+     ------------------------------------------------------- */
+  function initCursorTrail() {
+    var finePointerQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+    var reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    if (!finePointerQuery.matches || reducedMotionQuery.matches) {
+      return;
+    }
+
+    var canvas = document.createElement('canvas');
+    canvas.className = 'cursor_trail';
+    canvas.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(canvas);
+
+    var context = canvas.getContext('2d');
+    var particles = [];
+    var MAX_PARTICLES = 140;
+    /* 크림 배경과 어울리는 앰버 - 테라코타 - 딥그린 계열 */
+    var TINTS = [
+      [255, 185, 0],
+      [239, 174, 144],
+      [246, 245, 242],
+      [13, 51, 34]
+    ];
+
+    var ratio = 1;
+    var lastX = null;
+    var lastY = null;
+    var animationId = null;
+
+    function resize() {
+      ratio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.floor(window.innerWidth * ratio);
+      canvas.height = Math.floor(window.innerHeight * ratio);
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+
+    function spawn(x, y, speed) {
+      /* 빠르게 움직일수록 입자를 조금 더 흘린다 */
+      var count = speed > 26 ? 3 : speed > 10 ? 2 : 1;
+
+      for (var i = 0; i < count; i += 1) {
+        if (particles.length >= MAX_PARTICLES) {
+          particles.shift();
+        }
+
+        var tint = TINTS[Math.floor(Math.random() * TINTS.length)];
+
+        particles.push({
+          x: x + (Math.random() - 0.5) * 14,
+          y: y + (Math.random() - 0.5) * 14,
+          vx: (Math.random() - 0.5) * 0.5,
+          /* 물방울처럼 아주 천천히 아래로 흘러내린다 */
+          vy: 0.16 + Math.random() * 0.34,
+          radius: 2.4 + Math.random() * 5.2,
+          life: 1,
+          decay: 0.012 + Math.random() * 0.016,
+          tint: tint,
+          alpha: tint === TINTS[3] ? 0.22 : 0.5
+        });
+      }
+    }
+
+    function draw() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (var i = particles.length - 1; i >= 0; i -= 1) {
+        var p = particles[i];
+
+        p.life -= p.decay;
+
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.006;
+
+        /* 사라질수록 살짝 부풀며 흐려진다 */
+        var eased = p.life * p.life;
+        var radius = p.radius * (1.5 - eased * 0.5);
+        var gradient = context.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius);
+        var rgb = p.tint[0] + ',' + p.tint[1] + ',' + p.tint[2];
+
+        gradient.addColorStop(0, 'rgba(' + rgb + ',' + eased * p.alpha + ')');
+        gradient.addColorStop(0.55, 'rgba(' + rgb + ',' + eased * p.alpha * 0.42 + ')');
+        gradient.addColorStop(1, 'rgba(' + rgb + ',0)');
+
+        context.fillStyle = gradient;
+        context.beginPath();
+        context.arc(p.x, p.y, radius, 0, Math.PI * 2);
+        context.fill();
+      }
+
+      if (particles.length) {
+        animationId = window.requestAnimationFrame(draw);
+      } else {
+        animationId = null;
+      }
+    }
+
+    function start() {
+      if (animationId === null) {
+        animationId = window.requestAnimationFrame(draw);
+      }
+    }
+
+    window.addEventListener(
+      'pointermove',
+      function (event) {
+        if (event.pointerType === 'touch') {
+          return;
+        }
+
+        var speed = lastX === null ? 0 : Math.hypot(event.clientX - lastX, event.clientY - lastY);
+
+        lastX = event.clientX;
+        lastY = event.clientY;
+
+        spawn(event.clientX, event.clientY, speed);
+        start();
+      },
+      { passive: true }
+    );
+
+    /* 창을 벗어나면 새 입자를 만들지 않고 남은 입자만 사라지게 둔다 */
+    document.addEventListener('pointerleave', function () {
+      lastX = null;
+      lastY = null;
+    });
+
+    var resizeTimer;
+
+    window.addEventListener('resize', function () {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(resize, 150);
+    });
+
+    /* 도중에 모션 최소화로 바꾸면 즉시 정리한다 */
+    if (typeof reducedMotionQuery.addEventListener === 'function') {
+      reducedMotionQuery.addEventListener('change', function (event) {
+        if (event.matches) {
+          particles.length = 0;
+          context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      });
+    }
+
+    resize();
+  }
+
   initHeader();
   initMobileHeader();
   initResponsiveText();
@@ -566,4 +723,5 @@
   initFeatureMarquee();
   initLetterReveal();
   initBrandStory();
+  initCursorTrail();
 })();
