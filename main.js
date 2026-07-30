@@ -5,6 +5,106 @@
   'use strict';
 
   /* -------------------------------------------------------
+     인트로 / 스플래시 (PRD §8)
+     아래 셋 중 먼저 발생한 조건으로 인트로를 걷어낸다.
+       1) 휠 / 스크롤 / 터치 이동 / 아래 방향 키
+       2) Skip 버튼 클릭
+       3) 노출 후 3.5초 (타이머)
+     페이드 아웃이 끝나면 display: none 처리해 클릭을 가로채지 않게 한다.
+     ------------------------------------------------------- */
+  function initIntro() {
+    var intro = document.getElementById('intro_screen');
+
+    if (!intro) {
+      return;
+    }
+
+    var skipButton = document.getElementById('intro_skip');
+    var AUTO_DISMISS_DELAY = 3500;
+    /* styles.css의 .intro_screen transition(0.9s)과 맞춘 폴백 기준값 */
+    var FADE_DURATION = 900;
+    var SCROLL_KEYS = [' ', 'Spacebar', 'PageDown', 'ArrowDown', 'End', 'Enter', 'Escape'];
+    var isDismissed = false;
+    var autoTimer = null;
+
+    /* 새로고침 시 브라우저가 스크롤 위치를 복원하면 scroll 이벤트가 즉시 발생해
+       인트로가 보이자마자 닫힌다. 복원을 끄고 맨 위에서 시작한다. */
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
+    window.scrollTo(0, 0);
+    document.documentElement.classList.add('intro_is_active');
+    document.body.classList.add('intro_is_active');
+
+    function onWheel() {
+      dismiss();
+    }
+
+    function onKeydown(event) {
+      if (SCROLL_KEYS.indexOf(event.key) !== -1) {
+        dismiss();
+      }
+    }
+
+    function unbind() {
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchmove', onWheel);
+      window.removeEventListener('scroll', onWheel);
+      document.removeEventListener('keydown', onKeydown);
+    }
+
+    /* 전환이 끝난 뒤에만 흐름에서 완전히 제거한다 */
+    function remove() {
+      intro.classList.add('is_removed');
+      intro.setAttribute('aria-hidden', 'true');
+    }
+
+    function dismiss() {
+      if (isDismissed) {
+        return;
+      }
+
+      isDismissed = true;
+      window.clearTimeout(autoTimer);
+      unbind();
+
+      document.documentElement.classList.remove('intro_is_active');
+      document.body.classList.remove('intro_is_active');
+      intro.classList.add('is_leaving');
+
+      /* 숨겨질 요소 안에 포커스가 남지 않게 한다 */
+      if (skipButton && document.activeElement === skipButton) {
+        skipButton.blur();
+      }
+
+      /* 모션 최소화 등으로 transitionend가 오지 않는 경우를 대비한 폴백 */
+      var fallbackTimer = window.setTimeout(remove, FADE_DURATION + 150);
+
+      intro.addEventListener('transitionend', function onTransitionEnd(event) {
+        if (event.target !== intro || event.propertyName !== 'opacity') {
+          return;
+        }
+
+        intro.removeEventListener('transitionend', onTransitionEnd);
+        window.clearTimeout(fallbackTimer);
+        remove();
+      });
+    }
+
+    window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('touchmove', onWheel, { passive: true });
+    window.addEventListener('scroll', onWheel, { passive: true });
+    document.addEventListener('keydown', onKeydown);
+
+    if (skipButton) {
+      skipButton.addEventListener('click', dismiss);
+    }
+
+    autoTimer = window.setTimeout(dismiss, AUTO_DISMISS_DELAY);
+  }
+
+  /* -------------------------------------------------------
      헤더: 히어로를 벗어나면 크림 배경 + 진한 글자로 전환
      ------------------------------------------------------- */
   function initHeader() {
@@ -719,6 +819,7 @@
     resize();
   }
 
+  initIntro();
   initHeader();
   initMobileHeader();
   initResponsiveText();

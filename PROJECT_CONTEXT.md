@@ -401,6 +401,32 @@ gallery→approach **360px**. 시안 실측 간격(400~580px)에 근접했다.
 검증: 캔버스 1280x900 / 버퍼 1942x1350(DPR 1.5), 이동 시 입자 28 → 77개 생성 후 감쇠,
 `elementFromPoint`로 내비 링크가 정상 히트(클릭 통과), 가로 스크롤 없음.
 
+### 인트로 / 스플래시 화면 (2026-07-30)
+
+PRD §8 미구현 항목. `index.html`의 `.intro_screen` + `styles.css` 인트로 블록 +
+`main.js`의 `initIntro()` 세 곳으로 구성된다.
+
+- 전체화면 고정 오버레이(`z-index: 200`)로 헤더(100)와 커서 캔버스(90) 위를 덮는다.
+  배경은 `21.brand1.jpg` + 딥그린 그라디언트(0.72 → 0.9), 그 위에 흰 로고 · 세리프 카피 ·
+  우상단 `Skip` 버튼 · 하단 `Scroll` 힌트를 얹었다. 로고는 흰색 에셋이라 딥그린 위에서 그대로 쓴다.
+- **해제 조건 3가지** — 먼저 발생한 하나로 닫힌다.
+  1. `wheel` / `scroll` / `touchmove`, 그리고 아래 방향 키(Space, PageDown, ArrowDown, End, Enter, Escape)
+  2. `Skip` 버튼 클릭
+  3. 노출 후 **3.5초** 타이머 (`AUTO_DISMISS_DELAY`)
+- 해제되면 `.is_leaving`(opacity 0, 0.9s)으로 페이드 아웃하고, `transitionend`(opacity) 시점에
+  `.is_removed`로 **`display: none`** 처리해 클릭을 가로채지 않게 한다.
+  모션 최소화 등으로 `transitionend`가 오지 않는 경우를 위해 `FADE_DURATION + 150ms` 폴백 타이머를 둔다.
+- 인트로가 떠 있는 동안 `html`/`body`에 `.intro_is_active`(`overflow: hidden`)를 걸어 뒤 페이지 스크롤을 잠근다.
+  `overflow: hidden`은 사용자 입력 스크롤만 막고 `wheel` 이벤트는 그대로 들어오므로 해제 조건이 계속 동작한다.
+- **새로고침 대응**: `history.scrollRestoration = 'manual'` + `scrollTo(0, 0)`.
+  이게 없으면 브라우저가 스크롤 위치를 복원하며 `scroll` 이벤트가 즉시 발생해 인트로가 보이자마자 닫힌다.
+- 해제 시 `aria-hidden="true"`를 붙이고, `Skip`에 포커스가 있으면 `blur()`해 숨은 요소에 포커스가 남지 않게 한다.
+- `prefers-reduced-motion: reduce`에서는 확대/등장 애니메이션을 끄고 페이드만 0.2s로 남긴다.
+
+`scrollbar-gutter: stable`로 잠금 중 스크롤바 폭(15px) 자리를 남기려 했으나,
+`overflow: hidden`인 스크롤 컨테이너에는 거터가 생기지 않아(실측 `clientWidth` 1188 = `innerWidth`) 제거했다.
+스크롤바가 사라지고 되돌아오는 순간은 모두 불투명한 오버레이가 가리는 구간이라 실제로 보이지 않는다.
+
 ## 검증 결과
 
 브라우저 실측 (2026-07-27).
@@ -414,12 +440,34 @@ gallery→approach **360px**. 시안 실측 간격(400~580px)에 근접했다.
 - 1280px 히어로 텍스트 40~680px / 지도 카드 805~1225px → 축 분리 확인
 - 360px에서 `.global_nav`만 내부 가로 스크롤(의도), 페이지 전체 스크롤은 없음
 
+### main.js 실제 동작 검증 (2026-07-30)
+
+`file://`에서는 스크립트가 차단되므로 **로컬 HTTP 서버(`localhost`)로 띄워** 실측했다.
+스크립트가 실제로 실행된 상태(`.cursor_trail` · `.feature_marquee.is_running` 생성 확인)에서 측정.
+
+| 항목 | 결과 |
+|---|---|
+| 인트로 - 타이머 | 입력 없이 자동 해제 → `is_leaving` → `is_removed`(`display: none`) |
+| 인트로 - 휠 | 실제 휠 입력 시 해제. `is_leaving` → 약 2.0s 뒤 `is_removed` |
+| 인트로 - Skip 클릭 | 해제 + `aria-hidden="true"`, 포커스는 `body`로 복귀 |
+| 인트로 - 키보드 | `ArrowDown`으로 해제 (키보드 사용자 대비) |
+| 스크롤 잠금 | 인트로 중 `html`/`body` `overflow: hidden`, 해제 후 클래스 제거 확인 |
+| 새로고침 | `scrollY` 0에서 시작 (스크롤 복원으로 인한 즉시 해제 없음) |
+| 해제 후 클릭 통과 | 화면 중앙 `hero_overlay`, 헤더 위치에서 GNB `현상하기` 히트 |
+| 헤더 전환 | threshold 398px 기준 - 0px `false` / 1000px · 2500px `true` |
+| 콘솔 오류 | 없음 |
+| 가로 스크롤 | 없음 |
+
+인트로 렌더링은 데스크톱(1188px)과 모바일(375x812) 모두 스크린샷으로 확인했다.
+초기에 한글 문구가 단어 중간에서 끊기고(`순간까 / 지`) `Scroll` 힌트와 겹쳐,
+`word-break: keep-all` + 본문 `padding-bottom: 108px`로 교정했다.
+
 ## 남은 문제
 
 ### 검증하지 못한 항목
 
-- **`main.js` 실제 동작 미검증**. 프리뷰 패널이 `file://` 스크립트를 차단함 (`net::ERR_BLOCKED_BY_CLIENT`).
-  CSS는 `is_scrolled` 수동 적용으로 전환 확인 완료. 실제 브라우저에서 스크롤 확인 필요.
+- `prefers-reduced-motion: reduce` 경로는 실측하지 못했다(브라우저 에뮬레이션 불가).
+  전환을 0.2s로 남겨 `transitionend`가 오게 했고, 오지 않아도 폴백 타이머가 `display: none`을 보장한다.
 
 ### 디자인 불일치
 
@@ -436,7 +484,6 @@ gallery→approach **360px**. 시안 실측 간격(400~580px)에 근접했다.
 
 | 항목 | PRD |
 |---|---|
-| 인트로 / 스플래시 + Skip | §8 |
 | Kakao/Naver 지도 API 연동, 마커·인포윈도우 | §7, §12 |
 | 3~4단계 간편 현상 접수 | §7 |
 | localStorage 원클릭 재접수 | §11 |

@@ -17,6 +17,33 @@
 </head>
 
 <body>
+  <!-- 인트로 / 스플래시 (PRD §8) - 사이트 접속 시 최우선 노출.
+       휠·스크롤 / Skip 클릭 / 3.5초 타이머 중 먼저 발생한 조건으로 페이드 아웃되고,
+       전환이 끝나면 main.js가 display:none 처리해 클릭을 방해하지 않는다. -->
+  <div class="intro_screen" id="intro_screen" role="dialog" aria-modal="true" aria-label="필름로그 인트로">
+    <div class="intro_background">
+      <img src="assets/image/21.brand1.jpg" alt="" />
+      <div class="intro_overlay"></div>
+    </div>
+
+    <button type="button" class="intro_skip" id="intro_skip">
+      Skip
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M7 17L17 7" />
+        <path d="M7 7H17V17" />
+      </svg>
+    </button>
+
+    <div class="intro_content">
+      <img class="intro_logo" src="assets/image/logo.png" alt="FILM LOG" />
+      <p class="intro_caption">From Shutter to Print.</p>
+      <p class="intro_title">셔터를 누르는 설렘부터 현상된 필름을 손에 쥐는 순간까지</p>
+    </div>
+
+    <p class="intro_hint" aria-hidden="true">Scroll</p>
+  </div>
+
   <div class="page_shell">
     <header class="site_header" id="site_header">
       <div class="header_inner">

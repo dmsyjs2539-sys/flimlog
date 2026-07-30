@@ -112,6 +112,186 @@ a {
 }
 
 /* ---------------------------------------------------------
+   인트로 / 스플래시 (PRD §8)
+   헤더(z-index 100)와 커서 캔버스(90) 위를 덮는 전체화면 오버레이.
+   main.js가 .is_leaving으로 페이드 아웃시키고, 전환이 끝나면
+   .is_removed(display: none)로 완전히 걷어내 클릭을 방해하지 않는다.
+   --------------------------------------------------------- */
+
+.intro_screen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* 아래 여백은 Scroll 힌트가 차지하는 높이만큼 비워 둔다 */
+  padding: 24px var(--gutter) 108px;
+  background: var(--color_brand);
+  color: var(--color_text_invert);
+  opacity: 1;
+  transition: opacity 0.9s ease;
+}
+
+.intro_screen.is_leaving {
+  opacity: 0;
+  /* 페이드 도중에도 아래 페이지를 조작할 수 있게 한다 */
+  pointer-events: none;
+}
+
+.intro_screen.is_removed {
+  display: none;
+}
+
+/* 인트로가 떠 있는 동안 뒤 페이지가 함께 스크롤되지 않게 잠근다.
+   (휠/터치 이벤트는 그대로 들어오므로 인트로 해제 조건은 계속 동작한다) */
+.intro_is_active {
+  overflow: hidden;
+}
+
+.intro_background {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.intro_background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.08);
+  animation: intro_zoom 7s ease-out forwards;
+}
+
+/* 브랜드 딥그린을 덧씌워 흰 로고와 글자가 확실히 읽히게 한다 */
+.intro_overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(13, 51, 34, 0.72) 0%, rgba(13, 51, 34, 0.9) 100%);
+}
+
+.intro_skip {
+  position: absolute;
+  top: 20px;
+  right: var(--gutter);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border: 1px solid rgba(246, 245, 242, 0.5);
+  border-radius: 60px;
+  background: transparent;
+  color: var(--color_text_invert);
+  font-size: var(--font_small);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.intro_skip:hover {
+  background: var(--color_accent);
+  border-color: var(--color_accent);
+  color: var(--color_accent_text);
+}
+
+.intro_content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+}
+
+/* logo.png는 투명 배경 위 흰색 로고라 딥그린 위에서 그대로 쓴다 */
+.intro_logo {
+  width: clamp(150px, 40vw, 260px);
+  animation: intro_rise 0.9s ease-out both;
+}
+
+.intro_caption {
+  margin: 0;
+  font-family: var(--font_serif);
+  font-size: clamp(26px, 6.4vw, 52px);
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  animation: intro_rise 0.9s ease-out 0.18s both;
+}
+
+.intro_title {
+  margin: 0;
+  max-width: 26em;
+  font-size: var(--font_body);
+  line-height: 1.7;
+  /* 한글이 단어 중간에서 끊기지 않게 한다 */
+  word-break: keep-all;
+  color: rgba(246, 245, 242, 0.78);
+  animation: intro_rise 0.9s ease-out 0.34s both;
+}
+
+/* 아래 세로선이 스크롤 조작을 유도한다 */
+.intro_hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 32px;
+  margin: 0;
+  text-align: center;
+  font-size: var(--font_xsmall);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(246, 245, 242, 0.7);
+}
+
+.intro_hint::after {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 44px;
+  margin: 12px auto 0;
+  background: linear-gradient(180deg, rgba(246, 245, 242, 0.8), rgba(246, 245, 242, 0));
+  animation: intro_hint_line 1.8s ease-in-out infinite;
+}
+
+@keyframes intro_zoom {
+  to {
+    transform: scale(1.16);
+  }
+}
+
+@keyframes intro_rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes intro_hint_line {
+
+  0%,
+  100% {
+    transform: scaleY(0.4);
+    transform-origin: top;
+    opacity: 0.4;
+  }
+
+  50% {
+    transform: scaleY(1);
+    transform-origin: top;
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------
    공통 섹션 블록 - 컨테이너 폭 + 좌우 여백 + 세로 여백을 한곳에서 관리
    --------------------------------------------------------- */
 
@@ -1918,6 +2098,28 @@ a {
 /* =========================================================
    접근성 - 모션 최소화 (PRD §15)
    ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  /* 인트로는 확대/등장 연출을 끄고, 페이드는 아주 짧게만 남긴다.
+     transition을 완전히 없애면 transitionend가 오지 않으므로
+     main.js가 폴백 타이머로 display:none을 처리한다. */
+  .intro_screen {
+    transition-duration: 0.2s;
+  }
+
+  .intro_background img,
+  .intro_logo,
+  .intro_caption,
+  .intro_title,
+  .intro_hint::after {
+    animation: none;
+  }
+
+  .intro_background img {
+    transform: none;
+  }
+}
 
 /* =========================================================
    모바일 - 767px 이하
